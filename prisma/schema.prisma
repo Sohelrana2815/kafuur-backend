@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// ENUMS (Application Flow States)
+// ==========================================
+
+enum Category {
+  MEN
+  WOMEN
+}
+
+enum PaymentMethod {
+  COD      // Cash on Delivery (Active default for MVP)
+  ONLINE   // Reserved placeholder for future credit card / mobile wallet integrations
+}
+
+enum OrderStatus {
+  PENDING    // Checkout form submitted; waiting for verification call
+  CONFIRMED  // Phone call successful; order confirmed with the customer
+  PROCESSING // Body spray is packed; courier invoice & tracking label generated
+  SHIPPED    // Order handed off to the courier company (Pathao, Steadfast, RedX, etc.)
+  DELIVERED  // Destination reached; cash collected by courier, order closed
+  CANCELLED  // Customer cancelled during call, or fake details provided (archived order)
+}
+
+// ==========================================
+// MODELS (PostgreSQL Tables)
+// ==========================================
+
+model Product {
+  id               String      @id @default(uuid())
+  name             String
+  slug             String      @unique // SEO & routing safe string (e.g., /products/coastal-rain)
+  images           String[]    // Native PostgreSQL array to map multiple product asset paths cleanly
+  shortDescription String
+  longDescription  String      @db.Text
+  price            Decimal     @db.Decimal(10, 2) // Prevents currency floating-point rounding bugs
+  category         Category
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  orderItems       OrderItem[]
+  reviews          Review[]    // Tracked in database; ready to output whenever frontend UI goes live
+}
+
+model Review {
+  id           String   @id @default(uuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  reviewerName String
+  rating       Int      // Value matching review star configurations (e.g., 1 to 5)
+  comment      String   @db.Text
+  createdAt    DateTime @default(now())
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  
+  // Mandatory Customer Demographics for Routing & Voice Verification
+  customerName  String
+  phone         String
+  altPhone      String?       // Optional fallback line for courier support
+  email         String
+  address       String        @db.Text
+  city          String        // Target district/city selector
+  thana         String        // Target sub-district/thana identifier for precise carrier handoffs
+  
+  // Internal Business Operational Tracking
+  status        OrderStatus   @default(PENDING)
+  paymentMethod PaymentMethod @default(COD)
+  
+  // Financial Tracking Points
+  deliveryFee   Decimal       @db.Decimal(10, 2) @default(60.00) // Explicit snapshot of shipping fee charged
+  totalAmount   Decimal       @db.Decimal(10, 2)                 // Entire checkout valuation: (Items Total) + deliveryFee
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  orderItems    OrderItem[]
+  
+  // Future Extensibility Hooks
+  userId        String?       // Nullable field allows clean association with future User tables
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2) // Chronological snapshot of the product price at moment of purchase
+}
