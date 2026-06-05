@@ -4,19 +4,13 @@ import auth from "../../middlewares/auth.js"; // Matches your precise auth cooki
 import { Role } from "@prisma/client";
 import { ProductControllers } from "./product.controller.js";
 import { ProductValidation } from "./product.validation.js";
-
 const router = Router();
-
 /**
  * @route   POST /api/products
  * @desc    Allows authenticated administrators to register brand-new store catalog products
  * @access  Private (Role.ADMIN Only)
  */
-router.post(
-    "/",
-    auth(Role.ADMIN), // Strict validation: analyzes request tokens for Admin signature status permissions
-    validateRequest(ProductValidation.createProducZodSchema), // Validates data layout fields via Zod before DB transactions
-    ProductControllers.createProduct
-);
-
+router.post("/", auth(Role.ADMIN), // Strict validation: analyzes request tokens for Admin signature status permissions
+validateRequest(ProductValidation.createProducZodSchema), // Validates data layout fields via Zod before DB transactions
+ProductControllers.createProduct);
 export const ProductRoutes = router;

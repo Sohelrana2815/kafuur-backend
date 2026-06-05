@@ -1,70 +1,24 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
+import { NextFunction, Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync.js"; // Matches your global runtime catch wrapper 
+import { sendResponse } from "../../utils/sendResponse.js"; // Matches your standardized API response blueprint 
+import { ProductServices } from "./product.service.js";
+import httpStatus from "http-status-codes";
 
-// import { NextFunction, Request, Response } from "express";
-// import { catchAsync } from "../../utils/catchAsync.js";
-// import { PostServices } from "./post.service.js";
-// import { sendResponse } from "../../utils/sendResponse.js";
-// import httpStatus from "http-status-codes";
+const createProduct = catchAsync(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async (req: Request, res: Response, next: NextFunction) => {
+        // Send incoming request body directly down to the business engine layer
+        const result = await ProductServices.createProduct(req.body);
 
-// // const createPost = catchAsync(
-// //   async (req: Request, res: Response, next: NextFunction) => {
-// //     // 1. Extract the author identity from the JWT (via req.user)
+        sendResponse(res, {
+            statusCode: httpStatus.StatusCodes.CREATED,
+            success: true,
+            message: "Product Created Successfully",
+            data: result,
+        });
+    }
+);
 
-// //     // const authorId = req.user?.userId as string;
-// //     // 2. Pass both the body (content/category) and the author identity
-
-// //     // const result = await PostServices.createPost(authorId, req.body);
-// //     sendResponse(res, {
-// //       statusCode: httpStatus.StatusCodes.CREATED,
-// //       success: true,
-// //       message: "Post Created Successfully",
-// //       data: result,
-// //     });
-// //   },
-// // );
-
-// const createPost = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const authorId = req.user?.userId as string;
-//     const result = await PostServices.createPost(authorId, req.body);
-
-//     sendResponse(res, {
-//       statusCode: httpStatus.StatusCodes.CREATED,
-//       success: true,
-//       message: "Post Created Successfully",
-//       data: result,
-//     });
-//   },
-// );
-
-// const getAllPosts = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const result = await PostServices.getAllPosts();
-//     sendResponse(res, {
-//       statusCode: httpStatus.StatusCodes.OK,
-//       success: true,
-//       message: "All Posts Retrieved Successfully",
-//       meta: result.meta,
-//       data: result.data,
-//     });
-//   },
-// );
-// const getPostBySlug = catchAsync(async (req: Request, res: Response) => {
-//   // Cast 'slug' to string to satisfy the PostServices parameter type
-//   const slug = req.params.slug as string;
-
-//   const result = await PostServices.getPostBySlug(slug);
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.StatusCodes.OK,
-//     success: true,
-//     message: "Post fetched successfully",
-//     data: result,
-//   });
-// });
-
-// export const PostControllers = {
-//   createPost,
-//   getAllPosts,
-//   getPostBySlug,
-// };
+export const ProductControllers = {
+    createProduct,
+};
