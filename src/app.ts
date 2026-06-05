@@ -24,8 +24,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-app.get("/health", (req: Request, res: Response) => {
-    res.json("I can do this all day💪 My Blog website");
+app.get("/kafuur", (req: Request, res: Response) => {
+    res.json("Be Positive and We care about you.!");
 });
 
 app.use(globalErrorHandler);
