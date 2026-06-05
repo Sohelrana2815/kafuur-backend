@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
 import "dotenv/config"; // Top-level
 import app from "./app.js";
+import prisma from "./app/lib/prisma.js";
 import { Server } from "http";
 import { envVars } from "./app/config/env.js";
-import prisma from "./app/lib/prisma.js";
+import { seedAdmin } from "./app/utils/seedAdmin.js";
 
 let server: Server;
 
@@ -14,6 +15,7 @@ const startServer = async () => {
 
         // 3. Run the admin seeding logic
 
+        await seedAdmin();
 
         server = app.listen(envVars.PORT, () => {
             console.log("🚀 Server running on port 5000");
@@ -23,6 +25,8 @@ const startServer = async () => {
         process.exit(1);
     }
 };
+
+
 
 (async () => {
     try {

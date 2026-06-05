@@ -1,9 +1,11 @@
 import express, { Application, Request, Response } from "express";
 // import { router } from "./app/routes/index.js";
 
-
+import cors from "cors";
 const app: Application = express();
-
+app.use(cors());
+app.use(express.json());
+// app.use("/api/v1", router);
 // app.use(
 //   expressSession({
 //     secret: process.env.EXPRESS_SESSION_SECRET as string,
@@ -11,7 +13,6 @@ const app: Application = express();
 //     saveUninitialized: false,
 //   }),
 // );
-app.use(express.json());
 // app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {
@@ -20,11 +21,10 @@ app.get("/", (req: Request, res: Response) => {
     });
 });
 
+
 app.get("/health", (req: Request, res: Response) => {
     res.json("I can do this all day💪 My Blog website");
 });
-
-
 
 export default app;
 

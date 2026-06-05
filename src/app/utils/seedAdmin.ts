@@ -1,4 +1,5 @@
 // import { AuthProvider } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { envVars } from "../config/env.js";
 import prisma from "../lib/prisma.js";
 import bcrypt from "bcrypt";
@@ -26,10 +27,10 @@ export const seedAdmin = async () => {
 
     await prisma.user.create({
       data: {
-        name: "Admin",
+        username: "Admin",
         email: envVars.ADMIN_EMAIL,
         password: hashedPassword,
-        role: "ADMIN",
+        role: Role.ADMIN,
         // provider: [AuthProvider.CREDENTIALS],
       },
     });
