@@ -7,12 +7,8 @@ import AppError from "../../errorsHelpers/AppError.js";
 const createProduct = catchAsync(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async (req, res, next) => {
-    const payload = {
-        ...req.body,
-        images: req.files.map((file) => file.path),
-    };
-    // Pass clean object to service
-    const result = await ProductServices.createProduct(payload);
+    // req.body is now fully formatted and validated by Zod!
+    const result = await ProductServices.createProduct(req.body);
     sendResponse(res, {
         statusCode: httpStatus.StatusCodes.CREATED,
         success: true,

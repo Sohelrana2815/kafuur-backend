@@ -5,17 +5,12 @@ import { sendResponse } from "../../utils/sendResponse.js"; // Matches your stan
 import httpStatus from "http-status-codes";
 import { ProductServices } from "./product.service.js";
 import AppError from "../../errorsHelpers/AppError.js";
-import { Product } from "@prisma/client";
 
 const createProduct = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
-    const payload: Product = {
-      ...req.body,
-      images: (req.files as Express.Multer.File[]).map((file) => file.path),
-    };
-    // Pass clean object to service
-    const result = await ProductServices.createProduct(payload);
+    // req.body is now fully formatted and validated by Zod!
+    const result = await ProductServices.createProduct(req.body);
 
     sendResponse(res, {
       statusCode: httpStatus.StatusCodes.CREATED,

@@ -11,6 +11,18 @@ const router = Router();
  * @desc    Allows authenticated administrators to register brand-new store catalog products
  * @access  Private (Role.ADMIN Only)
  */
-router.post("/", auth(Role.ADMIN), multerUpload.array("files"), validateRequest(ProductValidation.createProducZodSchema), ProductControllers.createProduct);
-router.patch("/:id", auth(Role.ADMIN), multerUpload.array("files"), validateRequest(ProductValidation.createProducZodSchema), ProductControllers.updateProduct);
+router.post("/", auth(Role.ADMIN), multerUpload.array("files"), 
+// -> THE FIX: Bridge Middleware <-
+(req, res, next) => {
+    // 1. If text data is sent inside a 'data' string (common in Postman form-data), parse it early
+    if (req.body?.data && typeof req.body.data === "string") {
+        req.body = JSON.parse(req.body.data);
+    }
+    // 2. Map Cloudinary file paths directly into the body so Zod can validate them
+    if (req.files && Array.isArray(req.files)) {
+        req.body.images = req.files.map((file) => file.path);
+    }
+    next();
+}, validateRequest(ProductValidation.createProducZodSchema), ProductControllers.createProduct);
+router.patch("/:id", auth(Role.ADMIN), multerUpload.array("files"), validateRequest(ProductValidation.updateProducZodSchema), ProductControllers.updateProduct);
 export const ProductRoutes = router;

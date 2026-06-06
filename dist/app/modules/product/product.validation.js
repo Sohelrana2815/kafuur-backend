@@ -8,7 +8,7 @@ const productBodySchema = z.object({
         .max(100, "Product name is too long"),
     slug: z
         .string({
-        error: "Product slug is required"
+        error: "Product slug is required",
     })
         .min(5, "Slug is too short!")
         .regex(/^[a-z0-9-]+$/, "Slug must be URL-safe (lowercase letters, numbers, and hyphens only)"),
@@ -44,7 +44,7 @@ const createProducZodSchema = z.object({
 });
 // Future Proofing: Update schema where all properties are optional
 const updateProducZodSchema = z.object({
-    body: productBodySchema.partial()
+    body: productBodySchema.partial(),
 });
 export const ProductValidation = {
     createProducZodSchema,
