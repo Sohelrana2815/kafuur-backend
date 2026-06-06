@@ -3,8 +3,16 @@ import httpStatus from "http-status-codes";
 import { ZodError } from "zod";
 import { handleZodError } from "../errors/handleZodError.js";
 import AppError from "../errorsHelpers/AppError.js";
+import { deleteImageFromCloudinary } from "../config/cloudinary.config.js";
 // Global err handler
-export const globalErrorHandler = (err, req, res, next) => {
+export const globalErrorHandler = async (err, req, res, next) => {
+    // if (req.file) {
+    //   await deleteImageFromCloudinary(req.file.path);
+    // }
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        const imageUrls = req.files.map((file) => file.path);
+        await Promise.all(imageUrls.map((url) => deleteImageFromCloudinary(url)));
+    }
     // 1. Defaults
     let statusCode = httpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
     let message = "Something went wrong!";

@@ -11,7 +11,6 @@ const router = Router();
  * @desc    Allows authenticated administrators to register brand-new store catalog products
  * @access  Private (Role.ADMIN Only)
  */
-router.post("/", auth(Role.ADMIN), // Strict validation: analyzes request tokens for Admin signature status permissions
-multerUpload.array("files"), validateRequest(ProductValidation.createProducZodSchema), // Validates data layout fields via Zod before DB transactions
-ProductControllers.createProduct);
+router.post("/", auth(Role.ADMIN), multerUpload.array("files"), validateRequest(ProductValidation.createProducZodSchema), ProductControllers.createProduct);
+router.patch("/:id", auth(Role.ADMIN), multerUpload.array("files"), validateRequest(ProductValidation.createProducZodSchema), ProductControllers.updateProduct);
 export const ProductRoutes = router;
