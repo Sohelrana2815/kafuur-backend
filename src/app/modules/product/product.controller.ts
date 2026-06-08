@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync.js"; // Matches your global runtime catch wrapper
 import { sendResponse } from "../../utils/sendResponse.js"; // Matches your standardized API response blueprint
@@ -22,6 +23,18 @@ const createProduct = catchAsync(
   },
 );
 
+const getAllProducts = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ProductServices.getAllProducts();
+
+    sendResponse(res, {
+      statusCode: httpStatus.StatusCodes.OK,
+      success: true,
+      message: "Products retrieved successfully",
+      data: result,
+    });
+  },
+);
 const updateProduct = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
@@ -44,7 +57,25 @@ const updateProduct = catchAsync(
   },
 );
 
+const deleteProducts = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { ids } = req.body;
+
+    const result = await ProductServices.deleteProducts(ids);
+
+    sendResponse(res, {
+      statusCode: httpStatus.StatusCodes.OK,
+      success: true,
+      message: `${result.count} Product(s) successfully soft-deleted.`,
+      data: null,
+    });
+  },
+);
+
 export const ProductControllers = {
   createProduct,
+  getAllProducts,
   updateProduct,
+  deleteProducts,
 };

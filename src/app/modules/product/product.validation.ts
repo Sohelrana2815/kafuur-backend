@@ -53,16 +53,70 @@ const productBodySchema = z.object({
   }),
 });
 
+// Future Proofing: Update schema where all properties are optional
+const updateProductBodySchema = z.object({
+  name: z
+    .string()
+    .min(3, "Product name is too short!")
+    .max(100, "Product name is too long")
+    .optional(),
+
+  slug: z
+    .string()
+    .min(5, "Slug is too short!")
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug must be URL-safe (lowercase letters, numbers, and hyphens only)",
+    )
+    .optional(),
+
+  shortDescription: z
+    .string()
+    .min(10, "Short description is too short!")
+    .max(255, "Short description is too long!")
+    .optional(),
+
+  longDescription: z
+    .string()
+    .min(20, "Long description must provide substantial item specifications")
+    .optional(),
+
+  price: z
+    .number()
+    .positive("Price must be a positive currency amount greater than 0")
+    .optional(),
+
+  category: z.enum(["MEN", "WOMEN"]).optional(),
+
+  // These handle your image adding/removing logic
+  deleteImages: z
+    .array(z.string().url({ message: "Must be a valid Cloudinary URL" }))
+    .optional(),
+
+  newImages: z.array(z.url()).optional(),
+});
+
+// Add this below your updateProducZodSchema
+const deleteProductsBodySchema = z.object({
+  ids: z
+    .array(z.string())
+    .min(1, "At least one product ID is required for deletion."),
+});
+
 const createProducZodSchema = z.object({
   body: productBodySchema,
 });
 
-// Future Proofing: Update schema where all properties are optional
 const updateProducZodSchema = z.object({
-  body: productBodySchema.partial(),
+  body: updateProductBodySchema,
+});
+
+const deleteProductsZodSchema = z.object({
+  body: deleteProductsBodySchema,
 });
 
 export const ProductValidation = {
   createProducZodSchema,
   updateProducZodSchema,
+  deleteProductsZodSchema,
 };

@@ -50,6 +50,7 @@ model Product {
   longDescription  String
   price            Decimal     @db.Decimal(10, 2)
   category         Category
+  isDeleted        Boolean     @default(false)
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
   orderItems       OrderItem[]
@@ -58,14 +59,17 @@ model Product {
 }
 
 model Article {
-  id         String   @id @default(uuid())
-  title      String
-  slug       String   @unique // For clean URLs like kafuur.com/blog/choosing-the-right-scent
-  content    String   @db.Text
-  coverImage String? // Optional main banner image for the article
-  published  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String   @id @default(uuid())
+  title           String
+  metaDescription String
+  slug            String   @unique // For clean URLs like kafuur.com/blog/choosing-the-right-scent
+  content         String   @db.Text
+  category        String
+  tags            String[]
+  coverImage      String? // Optional main banner image for the article
+  published       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Review {

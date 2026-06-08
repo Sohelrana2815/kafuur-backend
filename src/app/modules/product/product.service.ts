@@ -38,7 +38,13 @@ const createProduct = async (payload: Product): Promise<Product> => {
 
   return result;
 };
-
+const getAllProducts = async () => {
+  // Only get products that haven't been soft-deleted
+  return await prisma.product.findMany({
+    where: { isDeleted: false },
+    orderBy: { createdAt: "desc" },
+  });
+};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const updateProduct = async (id: string, payload: any) => {
   const existingProduct = await prisma.product.findUnique({ where: { id } });
@@ -184,7 +190,53 @@ const updateProduct = async (id: string, payload: any) => {
 // };
 
 // Don't forget to export it!
+/**
+ * Soft deletes single or multiple products while hard deleting their Cloudinary assets.
+ * @param ids Array of product IDs to delete
+ */
+const deleteProducts = async (ids: string[]) => {
+  // 1. Fetch targeted items that haven't been soft deleted yet
+  const productsToDelete = await prisma.product.findMany({
+    where: {
+      id: { in: ids },
+      isDeleted: false,
+    },
+  });
+
+  if (productsToDelete.length === 0) {
+    throw new AppError(
+      httpStatus.StatusCodes.NOT_FOUND,
+      "No matching active products were found to delete.",
+    );
+  }
+
+  // 2. Gather every single image path across the list of items
+  const allImageUrls = productsToDelete.flatMap((product) => product.images);
+
+  // 3. Fire parallel hard-delete executions directly into Cloudinary
+  if (allImageUrls.length > 0) {
+    await Promise.all(
+      allImageUrls.map((url) => deleteImageFromCloudinary(url)),
+    );
+  }
+
+  // 4. Conclude the transaction by soft-deleting targets and cleaning out URLs
+  const result = await prisma.product.updateMany({
+    where: {
+      id: { in: ids },
+    },
+    data: {
+      isDeleted: true,
+      images: [], // Clears broken URLs so your database remains clean
+    },
+  });
+
+  return result;
+};
+
 export const ProductServices = {
   createProduct,
-  updateProduct, // <-- Add this
+  getAllProducts,
+  updateProduct,
+  deleteProducts,
 };
