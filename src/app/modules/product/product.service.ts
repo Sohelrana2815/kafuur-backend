@@ -4,11 +4,10 @@ import prisma from "../../lib/prisma.js"; // Leverages your exact centralized Pr
 import AppError from "../../errorsHelpers/AppError.js"; // Leverages your standard AppError handler [cite: 2]
 import httpStatus from "http-status-codes";
 import { deleteImageFromCloudinary } from "../../config/cloudinary.config.js";
+import { TUpdateProductInput } from "./product.validation.js";
+import { productSearchableFields } from "./product.constant.js";
+import { QueryBuilder } from "../../utils/QueryBuilder.js";
 
-/**
- * Persists a new fragrance item record within the PostgreSQL instance.
- * @param payload Fully typed data reflecting the Product schema specifications.
- */
 const createProduct = async (payload: Product): Promise<Product> => {
   // throw new Error("A Product with this slug already exists.");
   // Check for slug conflicts to enforce the @unique database schema constraint
@@ -19,7 +18,7 @@ const createProduct = async (payload: Product): Promise<Product> => {
   if (existingProduct) {
     throw new AppError(
       httpStatus.StatusCodes.CONFLICT,
-      "A product with this URL slug already exists. Slugs must be completely unique.",
+      "A product with this URL slug already exists. Slug must be completely unique.",
     );
   }
 
@@ -38,162 +37,87 @@ const createProduct = async (payload: Product): Promise<Product> => {
 
   return result;
 };
-const getAllProducts = async () => {
-  // Only get products that haven't been soft-deleted
-  return await prisma.product.findMany({
-    where: { isDeleted: false },
-    orderBy: { createdAt: "desc" },
-  });
-};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const updateProduct = async (id: string, payload: any) => {
+const getAllProducts = async (query: Record<string, any>) => {
+  // Pass baseline constraints directly (e.g., filter out deleted products automatically)
+  const queryBuilder = new QueryBuilder(prisma.product, {
+    isDeleted: false,
+    ...query,
+  });
+
+  const productsQuery = queryBuilder
+    .search(productSearchableFields)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  // Concurrently fetch catalog payload data and total counter metadata
+  const [data, meta] = await Promise.all([
+    productsQuery.build(),
+    queryBuilder.getMeta(),
+  ]);
+
+  return {
+    data,
+    meta,
+  };
+};
+
+export const updateProduct = async (
+  id: string,
+  payload: TUpdateProductInput,
+) => {
   const existingProduct = await prisma.product.findUnique({ where: { id } });
   if (!existingProduct) throw new AppError(404, "Product not found");
 
-  // 1. Process deletions
-  if (payload.deleteImages && Array.isArray(payload.deleteImages)) {
-    for (const url of payload.deleteImages) {
-      await deleteImageFromCloudinary(url); // Real-time deletion
-    }
-    // Remove deleted images from the final array
-    payload.images = (existingProduct.images || []).filter(
-      (img) => !payload.deleteImages.includes(img),
-    );
-  } else {
-    // If no deletions, start with current
-    payload.images = [...(existingProduct.images || [])];
-  }
-
-  // 2. Add new images (if any were uploaded)
-  if (payload.newImages && payload.newImages.length > 0) {
-    payload.images = [...payload.images, ...payload.newImages];
-  }
-
-  // 3. Update DB
   const { deleteImages, newImages, ...updateData } = payload;
+
+  let updatedImages: string[] = [...(existingProduct.images || [])];
+
+  // Copy old images like [img1,img2]
+
+  if (deleteImages && Array.isArray(deleteImages)) {
+    for (const url of deleteImages) {
+      await deleteImageFromCloudinary(url);
+    }
+    // Filter out deleted items safely
+    updatedImages = updatedImages.filter((img) => !deleteImages.includes(img));
+  }
+
+  // 3. Process new asset additions
+  if (newImages && newImages.length > 0) {
+    updatedImages = [...updatedImages, ...newImages];
+  }
+
+  // 4. Update DB with total compile-time safety
   return await prisma.product.update({
     where: { id },
-    data: { ...updateData, images: payload.images },
+    data: {
+      ...updateData, // Contains only name, slug, price, shortDescription, longDescription, category
+      images: updatedImages, // Explicitly binds the cleanly modified image array
+    },
   });
 };
 
-// const updateProduct = async (id: string, payload: Partial<Product>) => {
-//   // 1. Fetch the current product
-//   const existingProduct = await prisma.product.findUnique({ where: { id } });
-//   if (!existingProduct) throw new AppError(404, "Product not found");
+const getProductById = async (id: string) => {
+  const result = await prisma.product.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
 
-//   let updatedImages = [...(existingProduct.images || [])];
+  if (!result) {
+    throw new AppError(
+      httpStatus.StatusCodes.NOT_FOUND,
+      "The requested product could not be found or has been removed.",
+    );
+  }
+  return result;
+};
 
-//   // 2. Handle Deletions: Delete from Cloudinary and remove from the array
-//   if (payload.deleteImages && payload.deleteImages.length > 0) {
-//     for (const url of payload.deleteImages) {
-//       await deleteImageFromCloudinary(url);
-//       updatedImages = updatedImages.filter((img) => img !== url);
-//     }
-//   }
-
-//   // 3. Handle Additions: Append new images (from your middleware)
-//   if (payload.images && payload.images.length > 0) {
-//     updatedImages = [...updatedImages, ...payload.images];
-//   }
-
-//   // 4. Update Database
-//   // Note: Ensure you don't send 'deleteImages' field to prisma if it's not in your model
-//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   const { deleteImages, ...dataToUpdate } = payload;
-
-//   return await prisma.product.update({
-//     where: { id },
-//     data: {
-//       ...dataToUpdate,
-//       images: updatedImages,
-//     },
-//   });
-// };
-
-/**
- * Updates an existing product in the database.
- * @param id The unique identifier of the product.
- * @param payload Partial product data to update.
- */
-// const updateProduct = async (
-//   id: string,
-//   payload: Partial<Product>,
-// ): Promise<Product> => {
-//   // 1. Verify the product exists first
-//   const existingProduct = await prisma.product.findUnique({
-//     where: { id },
-//   });
-
-//   if (!existingProduct) {
-//     throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Product not found");
-//   }
-
-//   // 2. If the admin is changing the slug, ensure it doesn't collide with another product
-//   if (payload.slug && payload.slug !== existingProduct.slug) {
-//     const slugExists = await prisma.product.findUnique({
-//       where: { slug: payload.slug },
-//     });
-
-//     if (slugExists) {
-//       throw new AppError(
-//         httpStatus.StatusCodes.CONFLICT,
-//         "This slug is already used by another product. Slugs must be unique.",
-//       );
-//     }
-//   }
-
-//   if (
-//     payload.images &&
-//     payload.images.length > 0 &&
-//     existingProduct.images &&
-//     existingProduct.images.length > 0
-//   ) {
-//     payload.images = [...payload.images, ...existingProduct.images];
-//   }
-
-//   if (
-//     payload.deleteImages &&
-//     payload.deleteImages.length > 0 &&
-//     existingProduct.images &&
-//     existingProduct.images.length > 0
-//   ) {
-//     const restDBImages = existingProduct.images.filter(
-//       (imageUrl) => !payload.deleteImages?.includes(imageUrl),
-//     );
-
-//     const updatedPayloadImages = (payload.images || [])
-//       .filter((imageUrl) => !payload.deleteImages?.includes(imageUrl))
-//       .filter((imageUrl) => !restDBImages.includes(imageUrl));
-
-//     payload.images = [...restDBImages, ...updatedPayloadImages];
-//   }
-
-//   // 3. Perform the update
-//   const result = await prisma.product.update({
-//     where: { id },
-//     data: payload,
-//   });
-
-//   if (
-//     payload.deleteImages &&
-//     payload.deleteImages.length > 0 &&
-//     existingProduct.images &&
-//     existingProduct.images.length > 0
-//   ) {
-//     await Promise.all(
-//       payload.deleteImages.map((url) => deleteImageFromCloudinary(url)),
-//     );
-//   }
-
-//   return result;
-// };
-
-// Don't forget to export it!
-/**
- * Soft deletes single or multiple products while hard deleting their Cloudinary assets.
- * @param ids Array of product IDs to delete
- */
 const deleteProducts = async (ids: string[]) => {
   // 1. Fetch targeted items that haven't been soft deleted yet
   const productsToDelete = await prisma.product.findMany({
@@ -239,4 +163,5 @@ export const ProductServices = {
   getAllProducts,
   updateProduct,
   deleteProducts,
+  getProductById,
 };

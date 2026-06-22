@@ -33,5 +33,34 @@ router.post(
   validateRequest(ArticleValidation.createArticleZodSchema),
   ArticleControllers.createArticle,
 );
+router.get("/", auth(Role.ADMIN), ArticleControllers.getAllArticles);
 
+/**
+ * @route   PATCH /api/articles/:id
+ * @desc    Updates a blog article, handling text edits and single image replacement/deletion
+ * @access  Private (Role.ADMIN Only)
+ */
+router.patch(
+  "/:id",
+  auth(Role.ADMIN),
+  multerUpload.single("file"), // Look for a single file input
+
+  // Bridge Middleware
+  (req: Request, res: Response, next: NextFunction) => {
+    // 1. Parse text data from Postman's stringified JSON
+    if (req.body?.data && typeof req.body.data === "string") {
+      req.body = JSON.parse(req.body.data);
+    }
+
+    // 2. If a new file was uploaded, map it to coverImage for validation & service logic
+    if (req.file) {
+      req.body.coverImage = req.file.path;
+    }
+
+    next();
+  },
+
+  validateRequest(ArticleValidation.updateArticleZodSchema),
+  ArticleControllers.updateArticle,
+);
 export const ArticleRoutes = router;

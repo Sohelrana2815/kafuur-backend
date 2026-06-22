@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const productBodySchema = z.object({
+const createProductBodySchema = z.object({
   name: z
     .string({
       error: "Product name is required",
@@ -20,12 +20,12 @@ const productBodySchema = z.object({
 
   images: z
     .array(
-      z.url({
+      z.string({
         error: "Each image asset path must be a valid string path or URL",
       }),
     )
     .nonempty({
-      message: "At least one product image path is required",
+      message: "At least one product image is required",
     }),
 
   shortDescription: z
@@ -89,12 +89,12 @@ const updateProductBodySchema = z.object({
   category: z.enum(["MEN", "WOMEN"]).optional(),
 
   // These handle your image adding/removing logic
-  deleteImages: z
-    .array(z.string().url({ message: "Must be a valid Cloudinary URL" }))
-    .optional(),
+  deleteImages: z.array(z.url({ message: "Must be a valid URL" })).optional(),
 
   newImages: z.array(z.url()).optional(),
 });
+
+export type TUpdateProductInput = z.infer<typeof updateProductBodySchema>;
 
 // Add this below your updateProducZodSchema
 const deleteProductsBodySchema = z.object({
@@ -104,7 +104,7 @@ const deleteProductsBodySchema = z.object({
 });
 
 const createProducZodSchema = z.object({
-  body: productBodySchema,
+  body: createProductBodySchema,
 });
 
 const updateProducZodSchema = z.object({

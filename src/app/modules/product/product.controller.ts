@@ -8,9 +8,9 @@ import { ProductServices } from "./product.service.js";
 import AppError from "../../errorsHelpers/AppError.js";
 
 const createProduct = catchAsync(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     // req.body is now fully formatted and validated by Zod!
+    // console.log("From Next.js server action: ", req.body);
     const result = await ProductServices.createProduct(req.body);
 
     sendResponse(res, {
@@ -18,25 +18,26 @@ const createProduct = catchAsync(
       success: true,
       message: "Product Created Successfully",
       data: result,
-      // data: {},
     });
   },
 );
 
 const getAllProducts = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const result = await ProductServices.getAllProducts();
+    // Pass req.query down to your service layer so the Query Builder can extract it
+    const result = await ProductServices.getAllProducts(req.query);
 
     sendResponse(res, {
       statusCode: httpStatus.StatusCodes.OK,
       success: true,
       message: "Products retrieved successfully",
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   },
 );
-const updateProduct = catchAsync(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+export const updateProduct = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     if (!id || typeof id !== "string") {
@@ -46,12 +47,34 @@ const updateProduct = catchAsync(
       );
     }
 
+    // req.body perfectly flows into your strictly-typed service function contract
     const result = await ProductServices.updateProduct(id, req.body);
 
     sendResponse(res, {
       statusCode: httpStatus.StatusCodes.OK,
       success: true,
       message: "Product Updated Successfully",
+      data: result,
+    });
+  },
+);
+
+const getProductById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    if (!id || typeof id !== "string") {
+      throw new AppError(
+        httpStatus.StatusCodes.BAD_REQUEST,
+        "A valid Product ID string is required in the URL parameter.",
+      );
+    }
+
+    const result = await ProductServices.getProductById(id);
+    sendResponse(res, {
+      statusCode: httpStatus.StatusCodes.OK,
+      success: true,
+      message: "Product details retrieved successfully",
       data: result,
     });
   },
@@ -78,4 +101,5 @@ export const ProductControllers = {
   getAllProducts,
   updateProduct,
   deleteProducts,
+  getProductById,
 };

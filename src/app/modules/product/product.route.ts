@@ -8,27 +8,29 @@ import { multerUpload } from "../../config/multer.config.js";
 
 const router = Router();
 
-/**
- * @route   POST /api/products
- * @desc    Allows authenticated administrators to register brand-new store catalog products
- * @access  Private (Role.ADMIN Only)
- */
 router.post(
   "/",
   auth(Role.ADMIN),
   multerUpload.array("files"),
   // -> THE FIX: Bridge Middleware <-
   (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.body?.data);
+    // console.log("Does req.body.images exist yet?:", "images" in req.body);
     // 1. If text data is sent inside a 'data' string (common in Postman form-data), parse it early
     if (req.body?.data && typeof req.body.data === "string") {
       req.body = JSON.parse(req.body.data);
     }
+    // console.log(typeof req.body);
+    // console.log(typeof req.body);
+    // console.log("Does req.body.images exist yet?:", "images" in req.body);
 
     // 2. Map Cloudinary file paths directly into the body so Zod can validate them
     if (req.files && Array.isArray(req.files)) {
       req.body.images = (req.files as Express.Multer.File[]).map(
         (file) => file.path,
       );
+    } else {
+      req.body.images = [];
     }
 
     next();
@@ -37,20 +39,15 @@ router.post(
   ProductControllers.createProduct,
 );
 
-router.get("/", auth(Role.ADMIN), ProductControllers.getAllProducts);
+router.get("/", ProductControllers.getAllProducts);
 
-/**
- * @route   PATCH /api/products/bulk-delete
- * @desc    Soft deletes single or multiple products and permanently flushes Cloudinary assets
- * @access  Private (Role.ADMIN Only)
- */
 router.patch(
   "/bulk-delete",
   auth(Role.ADMIN),
   validateRequest(ProductValidation.deleteProductsZodSchema),
   ProductControllers.deleteProducts,
 );
-
+router.get("/:id", ProductControllers.getProductById);
 router.patch(
   "/:id",
   auth(Role.ADMIN),

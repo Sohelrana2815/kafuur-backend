@@ -1,5 +1,5 @@
 import { z } from "zod";
-const productBodySchema = z.object({
+const createProductBodySchema = z.object({
     name: z
         .string({
         error: "Product name is required",
@@ -13,11 +13,11 @@ const productBodySchema = z.object({
         .min(5, "Slug is too short!")
         .regex(/^[a-z0-9-]+$/, "Slug must be URL-safe (lowercase letters, numbers, and hyphens only)"),
     images: z
-        .array(z.url({
+        .array(z.string({
         error: "Each image asset path must be a valid string path or URL",
     }))
         .nonempty({
-        message: "At least one product image path is required",
+        message: "At least one product image is required",
     }),
     shortDescription: z
         .string({
@@ -66,9 +66,7 @@ const updateProductBodySchema = z.object({
         .optional(),
     category: z.enum(["MEN", "WOMEN"]).optional(),
     // These handle your image adding/removing logic
-    deleteImages: z
-        .array(z.string().url({ message: "Must be a valid Cloudinary URL" }))
-        .optional(),
+    deleteImages: z.array(z.url({ message: "Must be a valid URL" })).optional(),
     newImages: z.array(z.url()).optional(),
 });
 // Add this below your updateProducZodSchema
@@ -78,7 +76,7 @@ const deleteProductsBodySchema = z.object({
         .min(1, "At least one product ID is required for deletion."),
 });
 const createProducZodSchema = z.object({
-    body: productBodySchema,
+    body: createProductBodySchema,
 });
 const updateProducZodSchema = z.object({
     body: updateProductBodySchema,

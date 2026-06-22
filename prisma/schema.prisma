@@ -55,7 +55,6 @@ model Product {
   updatedAt        DateTime    @updatedAt
   orderItems       OrderItem[]
   reviews          Review[]
-  deleteImages     String[]
 }
 
 model Article {
