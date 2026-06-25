@@ -63,6 +63,10 @@ export const updateProduct = async (id, payload) => {
     if (newImages && newImages.length > 0) {
         updatedImages = [...updatedImages, ...newImages];
     }
+    // If name isn't provided or hasn't changed, this block is skipped entirely.
+    if (updateData.name && updateData.name !== existingProduct.name) {
+        updateData.slug = await generateUniqueSlug(updateData.name, id);
+    }
     // 4. Update DB with total compile-time safety
     return await prisma.product.update({
         where: { id },
