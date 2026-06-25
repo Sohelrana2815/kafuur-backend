@@ -4,20 +4,15 @@ import httpStatus from "http-status-codes";
 import { deleteImageFromCloudinary } from "../../config/cloudinary.config.js";
 import { productSearchableFields } from "./product.constant.js";
 import { QueryBuilder } from "../../utils/QueryBuilder.js";
+import { generateUniqueSlug } from "../../helper/generateUniqueSlug.js";
 const createProduct = async (payload) => {
-    // throw new Error("A Product with this slug already exists.");
-    // Check for slug conflicts to enforce the @unique database schema constraint
-    const existingProduct = await prisma.product.findUnique({
-        where: { slug: payload.slug },
-    });
-    if (existingProduct) {
-        throw new AppError(httpStatus.StatusCodes.CONFLICT, "A product with this URL slug already exists. Slug must be completely unique.");
-    }
+    // Automatically generate an entirely unique slug (e.g., "nike-air-max" or "nike-air-max-0")
+    const uniqueSlug = await generateUniqueSlug(payload.name);
     // Write new entity data directly into the database engine
     const result = await prisma.product.create({
         data: {
             name: payload.name,
-            slug: payload.slug,
+            slug: uniqueSlug,
             images: payload.images, // Array mapping for multiple asset path entries
             shortDescription: payload.shortDescription,
             longDescription: payload.longDescription,

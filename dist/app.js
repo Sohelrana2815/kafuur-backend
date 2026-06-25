@@ -10,15 +10,6 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1", router);
-// app.use("/api/v1", router);
-// app.use(
-//   expressSession({
-//     secret: process.env.EXPRESS_SESSION_SECRET as string,
-//     resave: false,
-//     saveUninitialized: false,
-//   }),
-// );
-// app.use("/api/v1", router);
 app.get("/", (req, res) => {
     res.send({
         message: "Kafuur Backend Running!!!",

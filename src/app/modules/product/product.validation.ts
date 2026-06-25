@@ -8,15 +8,15 @@ const createProductBodySchema = z.object({
     .min(3, "Product name is too short!")
     .max(100, "Product name is too long"),
 
-  slug: z
-    .string({
-      error: "Product slug is required",
-    })
-    .min(5, "Slug is too short!")
-    .regex(
-      /^[a-z0-9-]+$/,
-      "Slug must be URL-safe (lowercase letters, numbers, and hyphens only)",
-    ),
+  // slug: z
+  //   .string({
+  //     error: "Product slug is required",
+  //   })
+  //   .min(5, "Slug is too short!")
+  //   .regex(
+  //     /^[a-z0-9-]+$/,
+  //     "Slug must be URL-safe (lowercase letters, numbers, and hyphens only)",
+  //   ),
 
   images: z
     .array(
@@ -30,10 +30,10 @@ const createProductBodySchema = z.object({
 
   shortDescription: z
     .string({
-      error: "Short description is required",
+      error: "Product Summary is required",
     })
-    .min(10, "Short description is too short!")
-    .max(255, "Short description is too long!"),
+    .min(10, "Product Summary is too short!")
+    .max(255, "Product Summary is too long!"),
 
   longDescription: z
     .string({

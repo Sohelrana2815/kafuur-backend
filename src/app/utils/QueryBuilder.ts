@@ -2,12 +2,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/utils/QueryBuilder.ts
 
-export class QueryBuilder<TModel extends { findMany: any; count: any }> {
-  public model: TModel;
+
+
+export class QueryBuilder<T extends { findMany: any; count: any }> {
+  public model: T;
   public query: Record<string, any>;
   public prismaQuery: any;
 
-  constructor(model: TModel, query: Record<string, any>) {
+  constructor(model: T, query: Record<string, any>) {
     this.model = model;
     this.query = query;
     this.prismaQuery = {

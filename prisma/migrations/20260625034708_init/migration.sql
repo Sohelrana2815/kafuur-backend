@@ -36,7 +36,6 @@ CREATE TABLE "Product" (
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deleteImages" TEXT[],
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
