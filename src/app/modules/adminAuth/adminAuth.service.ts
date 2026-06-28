@@ -1,12 +1,12 @@
 import { Prisma, Role } from "@prisma/client";
-import prisma from "../../lib/prisma.js"; // Uses your exact central Prisma instance 
-import AppError from "../../errorsHelpers/AppError.js"; // Matches your error handling 
+import prisma from "../../lib/prisma.js"; // Uses your exact central Prisma instance
+import AppError from "../../errorsHelpers/AppError.js"; // Matches your error handling
 import httpStatus from "http-status-codes";
 import bcrypt from "bcrypt";
 import { envVars } from "../../config/env.js";
-import { generateToken } from "../../utils/jwt.js"; // Leverages your custom jwt helper 
+import { generateToken } from "../../utils/jwt.js"; // Leverages your custom jwt helper
 import { JwtPayload } from "jsonwebtoken";
-
+import crypto from "crypto";
 /**
  * Creates internal token payloads and maps sessions down to the database
  */
@@ -23,9 +23,6 @@ const createAdminAuthTokens = async (user: JwtPayload) => {
     envVars.JWT_ACCESS_EXPIRES_IN || "15m",
   );
 
-
-
-
   return { accessToken };
 };
 
@@ -35,10 +32,7 @@ const createAdminAuthTokens = async (user: JwtPayload) => {
 const registerAdmin = async (payload: Prisma.UserCreateInput) => {
   const duplicateAdmin = await prisma.user.findFirst({
     where: {
-      OR: [
-        { email: payload.email },
-        { username: payload.username }
-      ]
+      OR: [{ email: payload.email }, { username: payload.username }],
     },
   });
 
@@ -48,6 +42,13 @@ const registerAdmin = async (payload: Prisma.UserCreateInput) => {
       "An administrative account with this email or username already exists",
     );
   }
+  // 1. Add this Guard Clause to satisfy TypeScript and protect your backend
+  if (!payload.password) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "A password is required to register an administrative account.",
+    );
+  }
 
   const saltRounds = Number(envVars.BCRYPT_SALT_ROUND) || 10; // Matches your hashing salt extraction [cite: 83]
   const hashedPassword = await bcrypt.hash(payload.password, saltRounds); // Hashing execution [cite: 84]
@@ -55,6 +56,7 @@ const registerAdmin = async (payload: Prisma.UserCreateInput) => {
   const result = await prisma.user.create({
     data: {
       ...payload,
+      id: crypto.randomUUID(),
       password: hashedPassword,
       role: Role.ADMIN, // Explicitly lock registration privileges to ADMIN status
     },
@@ -68,22 +70,32 @@ const registerAdmin = async (payload: Prisma.UserCreateInput) => {
 /**
  * Validates credentials locally without relying on passport strategies
  */
-const loginAdmin = async (payload: Pick<Prisma.UserCreateInput, "email" | "password">) => {
+const loginAdmin = async (
+  payload: Pick<Prisma.UserCreateInput, "email" | "password">,
+) => {
   const { email, password } = payload;
+  // 1. Guard clause: Ensure a password was actually sent in the login request payload
+  if (!password) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "Password is required to authenticate.",
+    );
+  }
 
   const adminUser = await prisma.user.findUnique({
     where: { email },
   });
 
-  // Security optimization: validation failure if account does not exist or lacks admin privileges
-  if (!adminUser || adminUser.role !== Role.ADMIN) {
+  // 2. Security optimization: validation failure if account does not exist,
+  // lacks admin privileges, OR if it somehow doesn't have a hashed password.
+  if (!adminUser || adminUser.role !== Role.ADMIN || !adminUser.password) {
     throw new AppError(
       httpStatus.StatusCodes.UNAUTHORIZED,
       "Invalid administrative login credentials",
     );
   }
-
   const isPasswordMatch = await bcrypt.compare(password, adminUser.password);
+
   if (!isPasswordMatch) {
     throw new AppError(
       httpStatus.StatusCodes.UNAUTHORIZED,
@@ -91,7 +103,7 @@ const loginAdmin = async (payload: Pick<Prisma.UserCreateInput, "email" | "passw
     );
   }
 
-  const { accessToken, } = await createAdminAuthTokens(adminUser);
+  const { accessToken } = await createAdminAuthTokens(adminUser);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _, ...adminWithoutPassword } = adminUser;
 

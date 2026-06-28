@@ -47,7 +47,7 @@ router.patch(
   validateRequest(ProductValidation.deleteProductsZodSchema),
   ProductControllers.deleteProducts,
 );
-router.get("/:id", ProductControllers.getProductById);
+
 router.patch(
   "/:id",
   auth(Role.ADMIN),
@@ -73,5 +73,6 @@ router.patch(
   validateRequest(ProductValidation.updateProducZodSchema),
   ProductControllers.updateProduct,
 );
-
+router.get("/:slug", ProductControllers.getSingleProduct);
+router.get("/:id", ProductControllers.getProductById);
 export const ProductRoutes = router;

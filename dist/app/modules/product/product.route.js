@@ -29,7 +29,6 @@ router.post("/", auth(Role.ADMIN), multerUpload.array("files"),
 }, validateRequest(ProductValidation.createProducZodSchema), ProductControllers.createProduct);
 router.get("/", ProductControllers.getAllProducts);
 router.patch("/bulk-delete", auth(Role.ADMIN), validateRequest(ProductValidation.deleteProductsZodSchema), ProductControllers.deleteProducts);
-router.get("/:id", ProductControllers.getProductById);
 router.patch("/:id", auth(Role.ADMIN), multerUpload.array("files"), 
 // ---> THE BRIDGE MIDDLEWARE <---
 (req, res, next) => {
@@ -46,4 +45,6 @@ router.patch("/:id", auth(Role.ADMIN), multerUpload.array("files"),
     }
     next();
 }, validateRequest(ProductValidation.updateProducZodSchema), ProductControllers.updateProduct);
+router.get("/:slug", ProductControllers.getSingleProduct);
+router.get("/:id", ProductControllers.getProductById);
 export const ProductRoutes = router;

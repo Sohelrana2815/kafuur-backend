@@ -31,11 +31,17 @@ enum OrderStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id
   email     String   @unique
-  username  String   @unique
-  password  String // Bcrypt password
+  username  String?  @unique
+  password  String? // Bcrypt password
   role      Role     @default(CUSTOMER)
+  fullName  String?
+  phone     String?
+  altPhone  String?
+  address   String?  @db.Text
+  city      String?
+  thana     String?
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

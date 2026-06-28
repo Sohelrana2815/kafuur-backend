@@ -96,6 +96,23 @@ export const updateProduct = async (
   });
 };
 
+const getSingleProduct = async (slug: string) => {
+  // Use findFirst because you are filtering by both slug AND isDeleted status
+  const result = await prisma.product.findFirst({
+    where: {
+      slug: slug,
+      isDeleted: false,
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.StatusCodes.NOT_FOUND,
+      "The requested product could not be found or has been removed.",
+    );
+  }
+  return result;
+};
 const getProductById = async (id: string) => {
   const result = await prisma.product.findFirst({
     where: {
@@ -159,4 +176,5 @@ export const ProductServices = {
   updateProduct,
   deleteProducts,
   getProductById,
+  getSingleProduct,
 };

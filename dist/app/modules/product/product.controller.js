@@ -40,6 +40,21 @@ export const updateProduct = catchAsync(async (req, res, next) => {
         data: result,
     });
 });
+const getSingleProduct = catchAsync(async (req, res, next) => {
+    // 1. Extract 'slug' because your route is /:slug
+    const { slug } = req.params;
+    if (!slug || typeof slug !== "string") {
+        throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "A valid Product Slug is required in the URL parameter.");
+    }
+    // 2. Pass the slug value directly to your service function
+    const result = await ProductServices.getSingleProduct(slug);
+    sendResponse(res, {
+        statusCode: httpStatus.StatusCodes.OK,
+        success: true,
+        message: "Product details retrieved successfully",
+        data: result,
+    });
+});
 const getProductById = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     if (!id || typeof id !== "string") {
@@ -71,4 +86,5 @@ export const ProductControllers = {
     updateProduct,
     deleteProducts,
     getProductById,
+    getSingleProduct
 };

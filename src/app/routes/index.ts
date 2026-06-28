@@ -3,6 +3,7 @@ import { AdminAuthRoutes } from "../modules/adminAuth/adminAuth.route.js";
 import { ProductRoutes } from "../modules/product/product.route.js";
 import { OrderRoutes } from "../modules/order/order.route.js";
 import { ArticleRoutes } from "../modules/article/article.route.js";
+import { ClerkWebhookRoutes } from "../modules/clerk-webhook/clerkWebhook.route.js";
 
 export const router = Router();
 
@@ -11,6 +12,7 @@ const moduleRoutes = [
   { path: "/products", route: ProductRoutes },
   { path: "/orders", route: OrderRoutes },
   { path: "/articles", route: ArticleRoutes },
+  { path: "/webhooks", route: ClerkWebhookRoutes },
 ];
 
 moduleRoutes.forEach((route) => {
