@@ -113,7 +113,9 @@ const loginAdmin = async (
   };
 };
 
+
 export const AdminAuthServices = {
   registerAdmin,
   loginAdmin,
+
 };

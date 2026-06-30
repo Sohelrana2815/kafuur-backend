@@ -10,13 +10,26 @@ CREATE TYPE "PaymentMehod" AS ENUM ('COD', 'ONLINE');
 -- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED');
 
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'BLOCKED', 'BANNED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "username" TEXT,
+    "password" TEXT,
     "role" "Role" NOT NULL DEFAULT 'CUSTOMER',
+    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
+    "statusReason" TEXT,
+    "statusUpdatedAt" TIMESTAMP(3),
+    "deletedAt" TIMESTAMP(3),
+    "fullName" TEXT,
+    "phone" TEXT,
+    "altPhone" TEXT,
+    "address" TEXT,
+    "city" TEXT,
+    "thana" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
