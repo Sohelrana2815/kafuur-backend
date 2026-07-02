@@ -36,23 +36,33 @@ enum UserStatus {
   BANNED
 }
 
+model AuthProvider {
+  provider   String
+  providerId String
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerId])
+}
+
 model User {
-  id         String     @id
+  id         String         @id @default(ulid())
   name       String?
-  username   String?    @unique
-  email      String     @unique
+  username   String?        @unique
+  email      String         @unique
   password   String? // Bcrypt password
-  role       Role       @default(CUSTOMER)
-  isVerified Boolean    @default(false)
-  status     UserStatus @default(ACTIVE)
+  role       Role           @default(CUSTOMER)
+  isVerified Boolean        @default(false)
+  status     UserStatus     @default(ACTIVE)
   phone      String?
   altPhone   String?
-  address    String?    @db.Text
+  address    String?        @db.Text
   city       String?
   thana      String?
   orders     Order[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  auths      AuthProvider[]
 }
 
 model Product {

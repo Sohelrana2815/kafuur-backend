@@ -25,7 +25,13 @@ export const seedAdmin = async () => {
                 email: envVars.ADMIN_EMAIL,
                 password: hashedPassword,
                 role: Role.ADMIN,
-                // provider: [AuthProvider.CREDENTIALS],
+                isVerified: true,
+                auths: {
+                    create: {
+                        provider: "credentials",
+                        providerId: envVars.ADMIN_EMAIL,
+                    },
+                },
             },
         });
         console.log("✅ Admin user created successfully!");

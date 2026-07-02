@@ -12,4 +12,8 @@ router.get(
   UserControllers.getAllUsers,
 );
 
+router.post("/register", UserControllers.createUser);
+
 export const UserRoutes = router;
+
+// /api/v1/users/register

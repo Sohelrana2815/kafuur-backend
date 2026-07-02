@@ -5,7 +5,6 @@ import httpStatus from "http-status-codes";
 import bcrypt from "bcrypt";
 import { envVars } from "../../config/env.js";
 import { generateToken } from "../../utils/jwt.js"; // Leverages your custom jwt helper
-import crypto from "crypto";
 /**
  * Creates internal token payloads and maps sessions down to the database
  */
@@ -39,7 +38,6 @@ const registerAdmin = async (payload) => {
     const result = await prisma.user.create({
         data: {
             ...payload,
-            id: crypto.randomUUID(),
             password: hashedPassword,
             role: Role.ADMIN, // Explicitly lock registration privileges to ADMIN status
         },

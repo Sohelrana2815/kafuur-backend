@@ -4,6 +4,7 @@ import { envVars } from "../config/env.js";
 import prisma from "../lib/prisma.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto"; // 1. Import crypto
+
 export const seedAdmin = async () => {
   try {
     // 1. Check if an admin already exists
@@ -33,7 +34,13 @@ export const seedAdmin = async () => {
         email: envVars.ADMIN_EMAIL,
         password: hashedPassword,
         role: Role.ADMIN,
-        // provider: [AuthProvider.CREDENTIALS],
+        isVerified: true,
+        auths: {
+          create: {
+            provider: "credentials",
+            providerId: envVars.ADMIN_EMAIL,
+          },
+        },
       },
     });
 
