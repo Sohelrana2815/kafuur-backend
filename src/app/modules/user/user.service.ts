@@ -66,43 +66,104 @@ const getAllUsers = async (query: Record<string, any>) => {
   };
 };
 
-export const UserServices = {
-  createUser,
+const updateMyProfile = async (
+  userId: string,
+  payload: Prisma.UserUpdateInput,
+) => {
+  /**
+   * Email cannot update
+   * name, phone, password, address, city, thana can be updated
+   * password re-hashing after update
+   * only admin can update role, isDeleted, statuses
+   * User role update customer --> admin (Only admin can update role)
+   */
 
-  getAllUsers,
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  // Prevent users from elevating their own privileges or changing system statuses
+  const restrictedFields = [
+    "role",
+    "status",
+    "isVerified",
+    "isDeleted",
+    "email",
+  ];
+  const hasRestrictedFields = restrictedFields.some((field) =>
+    Object.keys(payload).includes(field),
+  );
+  if (hasRestrictedFields) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "You cannot update restricted fields",
+    );
+  }
+  // Hash password if they are updating it
+
+  if (payload.password) {
+    const saltRounds = Number(envVars.BCRYPT_SALT_ROUND) || 10;
+    payload.password = await bcrypt.hash(
+      payload.password as string,
+      saltRounds,
+    );
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: payload,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password, ...userWithoutPassword } = updatedUser;
+  return userWithoutPassword;
 };
 
+// --- 2. ADMIN UPDATING ANY USER ---
 
+const updateUserByAdmin = async (
+  userId: string,
+  payload: Prisma.UserUpdateInput,
+) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
 
-// const credentialsLogin = async (payload: Partial<IUser>) => {
-//     const { email, password } = payload;
+  if (!existingUser) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
+  }
 
-//     const isUserExist = await User.findOne({ email })
+  // Even admins shouldn't usually change a user's unique login email to prevent auth conflicts
+  if (payload.email) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "Email address cannot be updated",
+    );
+  }
+  if (payload.password) {
+    const saltRounds = Number(envVars.BCRYPT_SALT_ROUND) || 10;
+    payload.password = await bcrypt.hash(
+      payload.password as string,
+      saltRounds,
+    );
+  }
 
-//     if (!isUserExist) {
-//         throw new AppError(httpStatus.BAD_REQUEST, "Email does not exist")
-//     }
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: payload,
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password, ...userWithoutPassword } = updatedUser;
+  return userWithoutPassword;
+};
 
-//     const isPasswordMatched = await bcryptjs.compare(password as string, isUserExist.password as string)
-
-//     if (!isPasswordMatched) {
-//         throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password")
-//     }
-//     const jwtPayload = {
-//         userId: isUserExist._id,
-//         email: isUserExist.email,
-//         role: isUserExist.role
-//     }
-//     const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
-
-//     return {
-//         accessToken
-//     }
-
-// }
-
-// //user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token 
-
-// export const AuthServices = {
-//     credentialsLogin
-// }
+export const UserServices = {
+  createUser,
+  getAllUsers,
+  updateMyProfile,
+  updateUserByAdmin,
+};
