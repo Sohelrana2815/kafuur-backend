@@ -61,19 +61,39 @@ const getNewAccessToken = catchAsync(
     });
   },
 );
+const resetPassword = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.StatusCodes.OK,
+      message: "New Access Token Retrived Successfully",
+      data: null,
+    });
+  },
+);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const logout = catchAsync(async(req:Request,res:Response,next:NextFunction)=>{
-  res.clearCookie("accessToken",{
-    httpOnly:true,
-    secure:false,
-    sameSite:"lax"
+const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax"
   })
-  res.clearCookie("refreshToken",{
-    httpOnly:true,
-    secure:false,
-    sameSite:"lax"
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax"
   })
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.StatusCodes.OK,
+    message: "User Logged out Successfully",
+    data: null
+  })
+
 })
 
 export const AuthControllers = {

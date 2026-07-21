@@ -11,7 +11,7 @@ function getEnv(key: string, defaultValue?: string): string {
 }
 
 export const envVars = {
-  PORT: getEnv("PORT", "5001"),
+  PORT: getEnv("PORT", "5000"),
   DATABASE_URL: getEnv("DATABASE_URL"),
   NODE_ENV: getEnv("NODE_ENV", "development"),
   BCRYPT_SALT_ROUND: getEnv("BCRYPT_SALT_ROUND"),
@@ -26,4 +26,8 @@ export const envVars = {
   CLOUDINARY_CLOUDE_NAME: getEnv("CLOUDINARY_CLOUDE_NAME"),
   CLOUDINARY_API_KEY: getEnv("CLOUDINARY_API_KEY"),
   CLOUDINARY_API_SECRET: getEnv("CLOUDINARY_API_SECRET"),
+  // Passport Google OAuth20
+  GOOGLE_CLIENT_ID: getEnv("GOOGLE_CLIENT_ID"),
+  GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET"),
+  GOOGLE_CALLBACK_URL: getEnv("GOOGLE_CALLBACK_URL"),
 } as const;

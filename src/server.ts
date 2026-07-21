@@ -18,7 +18,7 @@ const startServer = async () => {
         await seedAdmin();
 
         server = app.listen(envVars.PORT, () => {
-            console.log("🚀 Server running on port 5000");
+            console.log(`🚀 Server running on port ${envVars.PORT}`);
         });
     } catch (error) {
         console.error("❌ DB Connection Error:", error);
