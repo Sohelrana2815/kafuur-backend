@@ -4,8 +4,10 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import notFound from "./app/middlewares/notFound.js";
 import cookieParser from "cookie-parser";
+import expressSession from "express-session";
 import { router } from "./app/routes/index.js";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
+import { envVars } from "./app/config/env.js";
 const app: Application = express();
 app.use(
   cors({
@@ -14,7 +16,11 @@ app.use(
   }),
 );
 app.use(express.json());
-
+app.use(expressSession({
+  secret: envVars.EXPRESS_SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}))
 app.use(cookieParser());
 app.use("/api/v1", router);
 
