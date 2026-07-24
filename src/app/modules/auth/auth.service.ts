@@ -7,8 +7,8 @@ import {
   createNewAccessTokenWithRefreshToken,
   createUserTokens,
 } from "../../utils/userTokens.js";
-import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env.js";
+import { CustomJwtPayload } from "./auth.interface.js";
 
 const credentialsLogin = async (
   payload: Pick<Prisma.UserCreateInput, "email" | "password">,
@@ -34,7 +34,7 @@ const credentialsLogin = async (
   if (!isPasswordMatch) {
     throw new AppError(
       httpStatus.StatusCodes.UNAUTHORIZED,
-      "Invalid login credentials",
+      "Invalid credentials",
     );
   }
 
@@ -76,28 +76,37 @@ const getNewAccessToken = async (refreshToken: string) => {
 };
 
 
-const changePassword = async(oldPassword :string, newPassword:string, decodedToken:JwtPayload)=>{
- 
+const changePassword = async (oldPassword: string, newPassword: string, decodedToken: CustomJwtPayload) => {
+  const userId = decodedToken?.userId;
   // User must need to logged in first to change their password
-  const  user = await prisma.user.findUnique({where:{
-    id:decodedToken?.userId
-  }})
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId
+    }
+  })
 
-  if(!user) {
+  if (!user) {
     throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "You must be logged in to change your password");
   }
+  // Handle Google OAuth users who don't have a password set
+
+  if (!user.password) {
+    throw new AppError(httpStatus.StatusCodes.BAD_REQUEST,
+      "This account was created via Google. Please lgoin with Google first and set a password first before changing your password.");
+  }
+
   // Compare the user input password to Stored Database password
-    const isOldPasswordMatch = await bcrypt.compare(oldPassword,  user?.password as string)
-    if (!isOldPasswordMatch) {
-        throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "Old Password does not match");
-    }
-    // If user give the valid old password then set the new password to DB
- // Hash the new password
+  const isOldPasswordMatch = await bcrypt.compare(oldPassword, user?.password as string)
+  if (!isOldPasswordMatch) {
+    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "Old Password does not match");
+  }
+  // If user give the valid old password then set the new password to DB
+  // Hash the new password
   const newHashedPassword = await bcrypt.hash(
     newPassword,
     Number(envVars.BCRYPT_SALT_ROUND)
   );
-// PERSIST TO DATABASE IN POSTGRESQL
+  // PERSIST TO DATABASE IN POSTGRESQL
   await prisma.user.update({
     where: { id: user.id },
     data: {
@@ -105,7 +114,7 @@ const changePassword = async(oldPassword :string, newPassword:string, decodedTok
     },
   });
 
-    
+
 }
 
 export const AuthServices = {

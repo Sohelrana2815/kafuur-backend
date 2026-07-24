@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { AuthServices } from "./auth.service.js";
 import httpStatus from "http-status-codes";
@@ -7,33 +7,96 @@ import AppError from "../../errorsHelpers/AppError.js";
 import { setAuthCookie } from "../../utils/setCookie.js";
 import { createUserTokens } from "../../utils/userTokens.js";
 import { envVars } from "../../config/env.js";
-import { JwtPayload } from "jsonwebtoken";
+import { CustomJwtPayload } from "./auth.interface.js";
+import passport from "passport";
 
-const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
-  const result = await AuthServices.credentialsLogin(req.body);
-  // const { accessToken, refreshToken, user } = result;
+const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  // const loginInfo = await AuthServices.credentialsLogin(req.body)
 
-  // Set Access Token in HTTP-Only Cookie exactly like your core configurations
-  // res.cookie("accessToken", accessToken, {
-  //   httpOnly: true,
-  //   secure: process.env.NODE_ENV === "production",
-  //   sameSite: "strict",
-  //   maxAge: 60 * 60 * 60 * 1000, // 1 day
-  // });
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true,
-  //   secure: process.env.NODE_ENV === "production",
-  //   sameSite: "strict",
-  //   maxAge: 30 * 60 * 60 * 60 * 1000, // 30 days
-  // });
-  setAuthCookie(res, result);
-  sendResponse(res, {
-    statusCode: httpStatus.StatusCodes.OK,
-    success: true,
-    message: "User Logged in Successfully",
-    data: result,
-  });
-});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  passport.authenticate("local", async (err: any, user: any, info: any) => {
+
+    if (err) {
+
+      // ❌❌❌❌❌
+      // throw new AppError(401, "Some error")
+      // next(err)
+      // return new AppError(401, err)
+
+
+      // ✅✅✅✅
+      // return next(err)
+      // console.log("from err");
+      return next(new AppError(401, err))
+    }
+
+    if (!user) {
+      // console.log("from !user");
+      // return new AppError(401, info.message)
+      return next(new AppError(401, info.message))
+    }
+
+    const userTokens = createUserTokens(user)
+
+    // delete user.toObject().password
+
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const { password: _, ...rest } = user.toObject()
+
+
+    setAuthCookie(res, userTokens)
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.StatusCodes.OK,
+      message: "User Logged In Successfully",
+      data: {
+        accessToken: userTokens.accessToken,
+        refreshToken: userTokens.refreshToken,
+        user: rest
+
+      },
+    })
+  })(req, res, next)
+
+  // res.cookie("accessToken", loginInfo.accessToken, {
+  //     httpOnly: true,
+  //     secure: false
+  // })
+
+
+  // res.cookie("refreshToken", loginInfo.refreshToken, {
+  //     httpOnly: true,
+  //     secure: false,
+  // })
+
+
+})
+// const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
+//   const result = await AuthServices.credentialsLogin(req.body);
+//   // const { accessToken, refreshToken, user } = result;
+
+//   // Set Access Token in HTTP-Only Cookie exactly like your core configurations
+//   // res.cookie("accessToken", accessToken, {
+//   //   httpOnly: true,
+//   //   secure: process.env.NODE_ENV === "production",
+//   //   sameSite: "strict",
+//   //   maxAge: 60 * 60 * 60 * 1000, // 1 day
+//   // });
+//   // res.cookie("refreshToken", refreshToken, {
+//   //   httpOnly: true,
+//   //   secure: process.env.NODE_ENV === "production",
+//   //   sameSite: "strict",
+//   //   maxAge: 30 * 60 * 60 * 60 * 1000, // 30 days
+//   // });
+//   setAuthCookie(res, result);
+//   sendResponse(res, {
+//     statusCode: httpStatus.StatusCodes.OK,
+//     success: true,
+//     message: "User Logged in Successfully",
+//     data: result,
+//   });
+// });
 
 const getNewAccessToken = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,7 +133,7 @@ const changePassword = catchAsync(
     const newPassword = req.body.newPassword;
     const oldPassword = req.body.oldPassword;
     const decodedToken = req.user
-    await AuthServices.changePassword(oldPassword, newPassword, decodedToken as JwtPayload);
+    await AuthServices.changePassword(oldPassword, newPassword, decodedToken as CustomJwtPayload);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.StatusCodes.OK,

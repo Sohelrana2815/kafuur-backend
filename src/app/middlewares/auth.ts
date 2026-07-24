@@ -3,14 +3,9 @@ import AppError from "../errorsHelpers/AppError.js";
 import httpStatus from "http-status-codes";
 import { verifyToken } from "../utils/jwt.js";
 import { envVars } from "../config/env.js";
-import { JwtPayload } from "jsonwebtoken";
-import { Role } from "@prisma/client";
+import { CustomJwtPayload } from "../modules/auth/auth.interface.js";
 
-export interface CustomJwtPayload extends JwtPayload {
-  id: string;
-  email: string;
-  role: Role;
-}
+
 
 const auth = (...requiredRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
