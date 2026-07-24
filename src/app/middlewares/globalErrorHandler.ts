@@ -13,6 +13,7 @@ export const globalErrorHandler = async (
   err: any,
   req: Request,
   res: Response,
+  // eslint-disable-next-line no-unused-vars
   next: NextFunction,
 ) => {
   // if (req.file) {

@@ -50,7 +50,7 @@ model User {
   id         String         @id @default(ulid())
   name       String?
   username   String?        @unique
-  picture    String?        
+  picture    String?
   email      String         @unique
   password   String? // Bcrypt password
   role       Role           @default(CUSTOMER)
@@ -63,6 +63,7 @@ model User {
   city       String?
   thana      String?
   orders     Order[]
+  cartItems  CartItem[]
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 }
@@ -81,6 +82,7 @@ model Product {
   updatedAt        DateTime    @updatedAt
   orderItems       OrderItem[]
   reviews          Review[]
+  cartItems        CartItem[]
 }
 
 model Article {
@@ -136,4 +138,19 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   quantity  Int
   price     Decimal @db.Decimal(10, 2)
+}
+
+// 3. Add the new CartItem model
+model CartItem {
+  id        String   @id @default(ulid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // This compound unique index is the secret sauce for clean design standards
+  @@unique([userId, productId])
 }

@@ -8,6 +8,8 @@ import expressSession from "express-session";
 import { router } from "./app/routes/index.js";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
 import { envVars } from "./app/config/env.js";
+import "./app/config/passport.js"
+import passport from "passport";
 const app: Application = express();
 app.use(
   cors({
@@ -21,6 +23,8 @@ app.use(expressSession({
   resave: false,
   saveUninitialized: false
 }))
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(cookieParser());
 app.use("/api/v1", router);
 

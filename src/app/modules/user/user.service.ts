@@ -40,7 +40,7 @@ const createUser = async (payload: Prisma.UserCreateInput) => {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const { password, ...userWithoutPassword } = user;
   return userWithoutPassword;
 };
@@ -118,7 +118,7 @@ const updateMyProfile = async (
     data: payload,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { password, ...userWithoutPassword } = updatedUser;
   return userWithoutPassword;
 };
@@ -156,7 +156,7 @@ const updateUserByAdmin = async (
     where: { id: userId },
     data: payload,
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { password, ...userWithoutPassword } = updatedUser;
   return userWithoutPassword;
 };

@@ -4,6 +4,13 @@ import httpStatus from "http-status-codes";
 import { verifyToken } from "../utils/jwt.js";
 import { envVars } from "../config/env.js";
 import { JwtPayload } from "jsonwebtoken";
+import { Role } from "@prisma/client";
+
+export interface CustomJwtPayload extends JwtPayload {
+  id: string;
+  email: string;
+  role: Role;
+}
 
 const auth = (...requiredRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +28,7 @@ const auth = (...requiredRoles: string[]) => {
 
       // 2. Verify token
 
-      const decoded = verifyToken<JwtPayload>(token, envVars.JWT_ACCESS_SECRET);
+      const decoded = verifyToken<CustomJwtPayload>(token, envVars.JWT_ACCESS_SECRET);
 
       if (!decoded) {
         throw new AppError(
@@ -42,7 +49,7 @@ const auth = (...requiredRoles: string[]) => {
 
       // 4. Success - Attach user to request and move to Controller
 
-      req.user = decoded as JwtPayload;
+      req.user = decoded 
       next();
     } catch (error) {
       next(error);

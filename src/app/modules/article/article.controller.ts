@@ -7,6 +7,7 @@ import { ArticleServices } from "./article.service.js";
 import AppError from "../../errorsHelpers/AppError.js";
 
 const createArticle = catchAsync(
+  // eslint-disable-next-line no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     // req.body is fully formatted and validated by Zod
     const result = await ArticleServices.createArticle(req.body);
@@ -21,6 +22,7 @@ const createArticle = catchAsync(
 );
 
 const getAllArticles = catchAsync(
+  // eslint-disable-next-line no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await ArticleServices.getAllArticles();
 
@@ -33,6 +35,7 @@ const getAllArticles = catchAsync(
   },
 );
 const updateArticle = catchAsync(
+  // eslint-disable-next-line no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 

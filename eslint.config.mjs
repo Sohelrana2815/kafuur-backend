@@ -15,7 +15,8 @@ export default defineConfig([
       ...tseslint.configs.stylistic,
     ],
     rules: {
-      "no-console": "warn"
+      "no-console": "warn",
+      "no-unused-vars": "error",
     }
   }
 ]);

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import httpStatus from "http-status-codes";
@@ -7,7 +7,7 @@ import { OrderServices } from "./order.service.js";
 
 const createOrder = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response) => {
     const result = await OrderServices.createOrder(req.body);
 
     sendResponse(res, {
@@ -20,7 +20,7 @@ const createOrder = catchAsync(
 );
 
 const getAllOrders = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response) => {
     const result = await OrderServices.getAllOrders();
 
     sendResponse(res, {

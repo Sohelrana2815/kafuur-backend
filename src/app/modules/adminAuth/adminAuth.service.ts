@@ -60,7 +60,7 @@ const registerAdmin = async (payload: Prisma.UserCreateInput) => {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { password, ...adminWithoutPassword } = result; // Strip hash from payload [cite: 85]
   return adminWithoutPassword;
 };
@@ -102,7 +102,7 @@ const loginAdmin = async (
   }
 
   const { accessToken } = await createAdminAuthTokens(adminUser);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { password: _, ...adminWithoutPassword } = adminUser;
 
   return {
