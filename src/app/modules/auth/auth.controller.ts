@@ -41,8 +41,7 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
     // delete user.toObject().password
 
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const { password: _, ...rest } = user.toObject()
-
+    const { password: _, ...rest } = user
 
     setAuthCookie(res, userTokens)
 
