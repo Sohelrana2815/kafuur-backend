@@ -5,6 +5,26 @@ import AppError from "../../errorsHelpers/AppError.js";
 import { CartServices } from "./cart.service.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { catchAsync } from "../../utils/catchAsync.js";
+import { JwtPayload } from "jsonwebtoken";
+
+
+
+const getOrderSummary = catchAsync(async (req: Request, res: Response) => {
+  const userId =  (req.user as JwtPayload)?.userId;
+
+  if (!userId) {
+    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "User identity missing");
+  }
+
+  const result = await CartServices.getOrderSummary(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Order summary calculated successfully",
+    data: result,
+  });
+});
 
 const updateCartItem = catchAsync(async (req: Request, res: Response) => {
   // Extract user ID mapped globally on the Request object
@@ -61,4 +81,5 @@ export const CartControllers = {
   updateCartItem,
   syncCart,
   getCart,
+  getOrderSummary
 };
