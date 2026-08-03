@@ -10,9 +10,9 @@ import { JwtPayload } from "jsonwebtoken";
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   // Utilizing your clean global Express interface
  const userId =  (req.user as JwtPayload)?.userId;
-  
+  console.log(userId,req.body,"From controller");
   if (!userId) {
-    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "User identity missing");
+    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "You are not authorized");
   }
 
   const result = await OrderServices.createOrder(userId, req.body);
@@ -25,6 +25,7 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
       : "Order placed successfully!",
     data: result,
   });
+  
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {

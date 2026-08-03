@@ -6,7 +6,7 @@ import Stripe from "stripe";
 import AppError from "../../errorsHelpers/AppError.js";
 import prisma from "../../lib/prisma.js";
 import httpStatus from "http-status-codes";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import { CreateOrderPayload } from "./order.interface.js";
 
 // Initialize Stripe with your Secret Key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -96,9 +96,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 // };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createOrder = async (userId: string, payload: any) => {
-  const { cartItemIds, paymentMethod } = payload;
 
+const createOrder = async (userId: string, payload: CreateOrderPayload) => {
+  const { cartItemIds, paymentMethod } = payload;
+  console.log(payload, "From service");
   // 1. Validate Profile Completeness
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || !user.phone || !user.address || !user.city || !user.thana) {
@@ -142,9 +143,7 @@ const createOrder = async (userId: string, payload: any) => {
 
   // 4. Determine Expiration for Online Payments (2 Hours)
   const isOnline = paymentMethod === "ONLINE";
-  const expiresAt = isOnline
-    ? new Date(Date.now() + 1 * 60 * 60 * 1000)
-    : null;
+  const expiresAt = isOnline ? new Date(Date.now() + 1 * 60 * 60 * 1000) : null;
 
   // 5. Create the Order (Snapshotting Address details)
   let order = await prisma.order.create({
@@ -197,7 +196,8 @@ const createOrder = async (userId: string, payload: any) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      // success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.FRONTEND_URL}/payment-success`,
       cancel_url: `${process.env.FRONTEND_URL}/checkout/cancel`,
       customer_email: user.email,
       client_reference_id: order.id,
@@ -220,6 +220,7 @@ const createOrder = async (userId: string, payload: any) => {
 
   // 7. If COD, just return the order without a payment link
   return { order, paymentUrl: null };
+
 };
 const getAllOrders = async () => {
   return await prisma.order.findMany({
