@@ -36,6 +36,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "pg": "^8.21.0",
+    "stripe": "^22.4.0",
     "svix": "^1.96.1",
     "zod": "^4.4.3"
   },

@@ -7,12 +7,16 @@ import { CartValidation } from "./cart.validation.js";
 
 const router = Router();
 
-// Get Order summary
-router.get("/order-summary", auth(Role.CUSTOMER, Role.ADMIN), CartControllers.getOrderSummary);
-
 // Retrieve cart data (requires login)
-router.get("/", auth(Role.CUSTOMER,Role.ADMIN), CartControllers.getCart);
+router.get("/", auth(Role.CUSTOMER, Role.ADMIN), CartControllers.getCart);
 // router.get("/", auth(...Object(Role)), CartControllers.getCart);
+
+// Get Order summary
+router.get(
+  "/order-summary",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  CartControllers.getOrderSummary,
+);
 
 // Add or update a single cart item
 router.post(
@@ -28,6 +32,13 @@ router.post(
   auth(Role.CUSTOMER, Role.ADMIN),
   validateRequest(CartValidation.syncCartZodSchema),
   CartControllers.syncCart,
+);
+
+// Single endpoint for both individual and bulk deletions
+router.delete(
+  "/",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  CartControllers.deleteCartItems,
 );
 
 export const CartRoutes = router;

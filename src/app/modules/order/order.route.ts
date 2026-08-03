@@ -1,6 +1,6 @@
 import { Router } from "express";
-import validateRequest from "../../middlewares/validateRequest.js";
-import { OrderValidation } from "./order.validation.js";
+// import validateRequest from "../../middlewares/validateRequest.js";
+// import { OrderValidation } from "./order.validation.js";
 import { OrderControllers } from "./order.controller.js";
 import auth from "../../middlewares/auth.js";
 import { Role } from "@prisma/client";
@@ -15,8 +15,9 @@ const router = Router();
  */
 router.post(
   "/",
+  auth(Role.CUSTOMER, Role.ADMIN),
   // auth("CUSTOMER", "ADMIN"), // Uncomment to enforce login before buying
-  validateRequest(OrderValidation.createOrderZodSchema),
+  // validateRequest(OrderValidation.createOrderZodSchema),
   OrderControllers.createOrder,
 );
 

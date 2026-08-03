@@ -1,10 +1,40 @@
-import prisma from "../../lib/prisma.js";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { Prisma } from "@prisma/client";
+import AppError from "../../errorsHelpers/AppError.js";
+import prisma from "../../lib/prisma.js";
+import httpStatus from "http-status-codes"
+// Retrieve the active user's cart populated with product details
+const getCart = async (userId: string, cartItemIds?: string[]) => {
+  // --- THE FIX STARTS HERE ---
+  // Replaced 'any' with the strictly typed Prisma WhereInput
+  const whereCondition: Prisma.CartItemWhereInput = { userId };
+
+  if (cartItemIds && cartItemIds.length > 0) {
+    whereCondition.id = { in: cartItemIds };
+  }
+  // --- THE FIX ENDS HERE ---
+
+  return await prisma.cartItem.findMany({
+    where: whereCondition,
+    include: {
+      product: {
+        select: { id: true, name: true, price: true, images: true },
+      },
+    },
+  });
+};
 // Order summary calculate
 
-const getOrderSummary = async (userId:string ) => {
+const getOrderSummary = async (userId:string, cartItemIds?: string[]) => {
+  const whereCondition: any = { userId };
+  // If specific items were selected in checkout, filter by those IDs
+  if (cartItemIds && cartItemIds.length > 0) {
+    whereCondition.id = { in: cartItemIds };
+    }
+
  const cartItems = await prisma.cartItem.findMany({
-  where: {userId},
+  where: whereCondition,
   include: {
     product: {
       select:{price:true} // WE NEED PRICE FOR CALCULATE SUBTOTAL AND TOTAL PRICE
@@ -65,6 +95,8 @@ const updateCartItem = async (
   });
 };
 
+
+
 // Merge guest cart array from LocalStorage upon login
 const syncCart = async (
   userId: string,
@@ -91,21 +123,29 @@ const syncCart = async (
   return await getCart(userId);
 };
 
-// Retrieve the active user's cart populated with product details
-const getCart = async (userId: string) => {
-  return await prisma.cartItem.findMany({
-    where: { userId },
-    include: {
-      product: {
-        select: { id: true, name: true, price: true, images: true },
-      },
+// Unified Delete Service (Handles 1 or many items safely)
+const deleteCartItems = async (ids: string[], userId: string) => {
+  const result = await prisma.cartItem.deleteMany({
+    where: {
+      id: { in: ids },
+      userId: userId, // Guarantees users can only delete their own items
     },
   });
+
+  if (result.count === 0) {
+    throw new AppError(
+      httpStatus.StatusCodes.NOT_FOUND,
+      "No matching cart items were found to delete.",
+    );
+  }
+
+  return result;
 };
 
 export const CartServices = {
   updateCartItem,
   syncCart,
   getCart,
-  getOrderSummary
+  getOrderSummary,
+  deleteCartItems
 };

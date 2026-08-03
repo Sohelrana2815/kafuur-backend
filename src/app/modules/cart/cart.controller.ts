@@ -8,15 +8,41 @@ import { catchAsync } from "../../utils/catchAsync.js";
 import { JwtPayload } from "jsonwebtoken";
 
 
+const getCart = catchAsync(async (req: Request, res: Response) => {
+  const userId = (req.user as CustomJwtPayload)?.id || (req.user as CustomJwtPayload)?.userId;
+  if (!userId) {
+    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "User identity missing");
+  }
+// --- THE FIX STARTS HERE ---
+  // Parse comma-separated IDs if provided in the URL: ?ids=id1,id2
+  const cartItemIds = req.query.ids 
+    ? (req.query.ids as string).split(",") 
+    : undefined;
 
+  // Pass the extracted array as the second argument
+  const result = await CartServices.getCart(userId, cartItemIds);
+  // --- THE FIX ENDS HERE ---
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Cart retrieved successfully",
+    data: result,
+  });
+});
 const getOrderSummary = catchAsync(async (req: Request, res: Response) => {
   const userId =  (req.user as JwtPayload)?.userId;
 
   if (!userId) {
     throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "User identity missing");
   }
+  
+// Parse comma-separated IDs if provided: ?ids=id1,id2
+  const cartItemIds = req.query.ids 
+    ? (req.query.ids as string).split(",") 
+    : undefined;
 
-  const result = await CartServices.getOrderSummary(userId);
+  const result = await CartServices.getOrderSummary(userId,cartItemIds);
 
   sendResponse(res, {
     statusCode: httpStatus.StatusCodes.OK,
@@ -61,19 +87,20 @@ const syncCart = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getCart = catchAsync(async (req: Request, res: Response) => {
+const deleteCartItems = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as CustomJwtPayload)?.id || (req.user as CustomJwtPayload)?.userId;
   if (!userId) {
     throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "User identity missing");
   }
 
-  const result = await CartServices.getCart(userId);
+  const { ids } = req.body; // Expecting { ids: ["id1", "id2"] } or { ids: ["id1"] }
+  const result = await CartServices.deleteCartItems(ids, userId);
 
   sendResponse(res, {
     statusCode: httpStatus.StatusCodes.OK,
     success: true,
-    message: "Cart retrieved successfully",
-    data: result,
+    message: `${result.count} item(s) removed from cart successfully`,
+    data: null,
   });
 });
 
@@ -81,5 +108,6 @@ export const CartControllers = {
   updateCartItem,
   syncCart,
   getCart,
-  getOrderSummary
+  getOrderSummary,
+  deleteCartItems
 };

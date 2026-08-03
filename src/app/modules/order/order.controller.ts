@@ -4,33 +4,39 @@ import { catchAsync } from "../../utils/catchAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import httpStatus from "http-status-codes";
 import { OrderServices } from "./order.service.js";
+import AppError from "../../errorsHelpers/AppError.js";
+import { JwtPayload } from "jsonwebtoken";
 
-const createOrder = catchAsync(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (req: Request, res: Response) => {
-    const result = await OrderServices.createOrder(req.body);
+const createOrder = catchAsync(async (req: Request, res: Response) => {
+  // Utilizing your clean global Express interface
+ const userId =  (req.user as JwtPayload)?.userId;
+  
+  if (!userId) {
+    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "User identity missing");
+  }
 
-    sendResponse(res, {
-      statusCode: httpStatus.StatusCodes.CREATED,
-      success: true,
-      message: "Order placed successfully!",
-      data: result,
-    });
-  },
-);
+  const result = await OrderServices.createOrder(userId, req.body);
 
-const getAllOrders = catchAsync(
-  async (req: Request, res: Response) => {
-    const result = await OrderServices.getAllOrders();
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.CREATED,
+    success: true,
+    message: result.paymentUrl 
+      ? "Order pending. Redirecting to payment gateway..." 
+      : "Order placed successfully!",
+    data: result,
+  });
+});
 
-    sendResponse(res, {
-      statusCode: httpStatus.StatusCodes.OK,
-      success: true,
-      message: "Orders retrieved successfully",
-      data: result,
-    });
-  },
-);
+const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderServices.getAllOrders();
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Orders retrieved successfully",
+    data: result,
+  });
+});
 
 export const OrderControllers = {
   createOrder,
