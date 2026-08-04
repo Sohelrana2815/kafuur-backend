@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { UserServices } from "./user.service.js";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.createUser(req.body);
@@ -29,7 +30,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 // --- 1. CUSTOMER CONTROLLER ---
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   // Extract userId directly from the authenticated token payload
-  const userId = req.user.userId;
+  const userId = (req.user as JwtPayload)?.userId;
   const payload = req.body;
 
   const result = await UserServices.updateMyProfile(userId, payload);

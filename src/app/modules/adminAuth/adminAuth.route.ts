@@ -13,7 +13,7 @@ router.post(
   "/register",
   auth(Role.ADMIN), // Uses your exact auth(...) role validation signature logic
   validateRequest(AdminAuthValidation.registerAdminZodSchema),
-  AdminAuthControllers.registerAdmin,
+  AdminAuthControllers.createAdmin,
 );
 
 /**

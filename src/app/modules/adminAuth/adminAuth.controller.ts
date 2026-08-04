@@ -4,8 +4,8 @@ import httpStatus from "http-status-codes";
 import { AdminAuthServices } from "./adminAuth.service.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 
-const registerAdmin = catchAsync(async (req: Request, res: Response) => {
-    const result = await AdminAuthServices.registerAdmin(req.body);
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminAuthServices.createAdmin(req.body);
 
     sendResponse(res, {
         statusCode: httpStatus.StatusCodes.CREATED,
@@ -41,6 +41,6 @@ const loginAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const AdminAuthControllers = {
-    registerAdmin,
+    createAdmin,
     loginAdmin,
 };

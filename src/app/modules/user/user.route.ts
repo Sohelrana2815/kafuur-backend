@@ -2,6 +2,9 @@ import { Router } from "express";
 import auth from "../../middlewares/auth.js"; // Matches your precise auth cookie interception middleware
 import { Role } from "@prisma/client";
 import { UserControllers } from "./user.controller.js";
+import validateRequest from "../../middlewares/validateRequest.js";
+import { CreateUserValidation } from "../auth/auth.validation.js";
+import { UpdateProfileValidation } from "./user.validation.js";
 
 const router = Router();
 
@@ -12,7 +15,7 @@ router.get(
   UserControllers.getAllUsers,
 );
 
-router.post("/register", UserControllers.createUser);
+router.post("/register",validateRequest(CreateUserValidation.createUserZodSchema), UserControllers.createUser);
 
 // PATCH routes (ORDER IS IMPORTANT)
 
@@ -21,6 +24,7 @@ router.post("/register", UserControllers.createUser);
 router.patch(
   "/me",
   auth(Role.CUSTOMER, Role.ADMIN),
+  validateRequest(UpdateProfileValidation.updateUserZodSchema),
   UserControllers.updateMyProfile,
 );
 

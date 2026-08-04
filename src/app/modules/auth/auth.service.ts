@@ -92,7 +92,7 @@ const changePassword = async (oldPassword: string, newPassword: string, decodedT
 
   if (!user.password) {
     throw new AppError(httpStatus.StatusCodes.BAD_REQUEST,
-      "This account was created via Google. Please lgoin with Google first and set a password first before changing your password.");
+      "This account was created via Google. Please login with Google first and set a password then you can change your password.");
   }
 
   // Compare the user input password to Stored Database password

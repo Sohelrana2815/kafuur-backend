@@ -41,7 +41,7 @@ const createUser = async (payload: Prisma.UserCreateInput) => {
   });
 
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const { password, ...userWithoutPassword } = user;
+  const { username, password, ...userWithoutPassword } = user;
   return userWithoutPassword;
 };
 
@@ -72,8 +72,8 @@ const updateMyProfile = async (
 ) => {
   /**
    * Email cannot update
-   * name, phone, password, address, city, thana can be updated
-   * password re-hashing after update
+   * name, phone, address, city, thana can be updated
+   * password cannot be updated, I have separate API for update password
    * only admin can update role, isDeleted, statuses
    * User role update customer --> admin (Only admin can update role)
    */
@@ -93,6 +93,7 @@ const updateMyProfile = async (
     "isVerified",
     "isDeleted",
     "email",
+    "password"
   ];
   const hasRestrictedFields = restrictedFields.some((field) =>
     Object.keys(payload).includes(field),
@@ -103,15 +104,15 @@ const updateMyProfile = async (
       "You cannot update restricted fields",
     );
   }
-  // Hash password if they are updating it
+  // // Hash password if they are updating it
 
-  if (payload.password) {
-    const saltRounds = Number(envVars.BCRYPT_SALT_ROUND) || 10;
-    payload.password = await bcrypt.hash(
-      payload.password as string,
-      saltRounds,
-    );
-  }
+  // if (payload.password) {
+  //   const saltRounds = Number(envVars.BCRYPT_SALT_ROUND) || 10;
+  //   payload.password = await bcrypt.hash(
+  //     payload.password as string,
+  //     saltRounds,
+  //   );
+  // }
 
   const updatedUser = await prisma.user.update({
     where: { id: userId },

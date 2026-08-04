@@ -28,7 +28,7 @@ const createAdminAuthTokens = async (user: JwtPayload) => {
 /**
  * Registers an internal administrative member (Guarded Route)
  */
-const registerAdmin = async (payload: Prisma.UserCreateInput) => {
+const createAdmin = async (payload: Prisma.UserCreateInput) => {
   const duplicateAdmin = await prisma.user.findFirst({
     where: {
       OR: [{ email: payload.email }, { username: payload.username }],
@@ -112,6 +112,6 @@ const loginAdmin = async (
 };
 
 export const AdminAuthServices = {
-  registerAdmin,
+  createAdmin,
   loginAdmin,
 };

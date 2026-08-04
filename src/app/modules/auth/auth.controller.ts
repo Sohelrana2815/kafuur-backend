@@ -11,7 +11,7 @@ import { CustomJwtPayload } from "./auth.interface.js";
 import passport from "passport";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  // const loginInfo = await AuthServices.credentialsLogin(req.body)
+  // const loginInfo = await AuthServices.credentialsLogin(req.body) // ❌❌❌ Not needed the service create user codes
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   passport.authenticate("local", async (err: any, user: any, info: any) => {
@@ -41,7 +41,7 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
     // delete user.toObject().password
 
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const { password: _, ...rest } = user
+    const { username,password, ...userWithoutPassword } = user
 
     setAuthCookie(res, userTokens)
 
@@ -52,7 +52,7 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
       data: {
         accessToken: userTokens.accessToken,
         refreshToken: userTokens.refreshToken,
-        user: rest
+        user: userWithoutPassword
 
       },
     })
@@ -98,13 +98,12 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
 // });
 
 const getNewAccessToken = catchAsync(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
       throw new AppError(
         httpStatus.StatusCodes.BAD_REQUEST,
-        "No refresh token recieved from cookies",
+        "No refresh token received from cookies",
       );
     }
     const tokenInfo = await AuthServices.getNewAccessToken(
@@ -121,7 +120,7 @@ const getNewAccessToken = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.StatusCodes.OK,
-      message: "New Access Token Retrived Successfully",
+      message: "New Access Token Retrieved Successfully",
       data: tokenInfo,
     });
   },
