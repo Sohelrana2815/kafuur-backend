@@ -10,6 +10,7 @@ import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
 import { envVars } from "./app/config/env.js";
 import "./app/config/passport.js"
 import passport from "passport";
+import { PaymentRoutes } from "./app/modules/payment/payment.route.js";
 const app: Application = express();
 app.use(
   cors({
@@ -17,6 +18,8 @@ app.use(
     credentials: true,
   }),
 );
+// ✅ 1. STRIPE WEBHOOK (Must come BEFORE express.json)
+app.use("/api/payment",PaymentRoutes)
 app.use(express.json());
 app.use(expressSession({
   secret: envVars.EXPRESS_SESSION_SECRET,

@@ -187,7 +187,7 @@ const createOrder = async (userId: string, payload: CreateOrderPayload) => {
     stripeLineItems.push({
       price_data: {
         currency: "usd",
-        product_data: { name: "Delivery Fee", images: [] },
+        product_data: { name: "Delivery Charge", images: [] },
         unit_amount: deliveryFee * 100,
       },
       quantity: 1,
@@ -222,6 +222,7 @@ const createOrder = async (userId: string, payload: CreateOrderPayload) => {
   return { order, paymentUrl: null };
 
 };
+
 const getAllOrders = async () => {
   return await prisma.order.findMany({
     include: {
