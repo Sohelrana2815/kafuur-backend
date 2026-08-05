@@ -11,13 +11,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 const stripeWebhook = async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"] as string;
   
-  // ⚠️ Make sure this uses STRIPE_WEBHOOK_SECRET, not STRIPE_SECRET_KEY!
   const webhookSecret = envVars.STRIPE_WEBHOOK_SECRET as string;
 
   let event: Stripe.Event;
 
   try {
-    // req.body MUST be a Buffer here, not a parsed JSON object
+    // req.body MUST be a Buffer , not a parsed JSON object
     event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
