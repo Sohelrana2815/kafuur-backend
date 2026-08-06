@@ -24,3 +24,6 @@ router.post(
 // Add this to your order.route.ts
 router.get("/", auth(Role.ADMIN), OrderControllers.getAllOrders);
 export const OrderRoutes = router;
+
+// GET /api/orders/my-orders
+router.get("/my-orders", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getMyOrders);

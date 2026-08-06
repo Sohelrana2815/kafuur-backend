@@ -86,6 +86,14 @@ export const updateProduct = async (
     updateData.slug = await generateUniqueSlug(updateData.name, id);
   }
 
+  // Prevent users from elevating their own privileges or changing system statuses
+  if ("isDeleted" in payload) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "You cannot update the isDeleted field",
+    );
+  }
+
   // 4. Update DB with total compile-time safety
   return await prisma.product.update({
     where: { id },

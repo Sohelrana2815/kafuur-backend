@@ -95,8 +95,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 //   });
 // };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-
 const createOrder = async (userId: string, payload: CreateOrderPayload) => {
   const { cartItemIds, paymentMethod } = payload;
   console.log(payload, "From service");
@@ -220,7 +218,6 @@ const createOrder = async (userId: string, payload: CreateOrderPayload) => {
 
   // 7. If COD, just return the order without a payment link
   return { order, paymentUrl: null };
-
 };
 
 const getAllOrders = async () => {
@@ -234,7 +231,34 @@ const getAllOrders = async () => {
   });
 };
 
+// Get My Orders
+
+const getMyOrders = async (userId: string) => {
+  const [data, total] = await prisma.$transaction([
+    prisma.order.findMany({
+      where: { userId },
+      include: {
+        orderItems: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    prisma.order.count({
+      where: { userId },
+    }),
+  ]);
+
+  return {
+    data,
+    meta : {
+      total
+    }
+  };
+};
+
 export const OrderServices = {
   createOrder,
   getAllOrders,
+  getMyOrders,
 };

@@ -47,10 +47,11 @@ const createProductBodySchema = z.object({
     })
     .positive("Price must be a positive currency amount greater than 0"),
 
-  category: z.enum(["MEN", "WOMEN"], {
-    error:
-      "Target fragrance classification category is required (MEN or WOMEN)",
-  }),
+   category: z
+  .enum(["MEN", "WOMEN"], {
+    error: "Category must be either MEN or WOMEN",
+  })
+ 
 });
 
 // Future Proofing: Update schema where all properties are optional
@@ -86,7 +87,11 @@ const updateProductBodySchema = z.object({
     .positive("Price must be a positive currency amount greater than 0")
     .optional(),
 
-  category: z.enum(["MEN", "WOMEN"]).optional(),
+  category: z
+  .enum(["MEN", "WOMEN"], {
+    error: "Category must be either MEN or WOMEN",
+  })
+  .optional(),
 
   // These handle your image adding/removing logic
   deleteImages: z.array(z.url({ message: "Must be a valid URL" })).optional(),
@@ -96,18 +101,18 @@ const updateProductBodySchema = z.object({
 
 export type TUpdateProductInput = z.infer<typeof updateProductBodySchema>;
 
-// Add this below your updateProducZodSchema
+// Add this below your updateProductZodSchema
 const deleteProductsBodySchema = z.object({
   ids: z
     .array(z.string())
     .min(1, "At least one product ID is required for deletion."),
 });
 
-const createProducZodSchema = z.object({
+const createProductZodSchema = z.object({
   body: createProductBodySchema,
 });
 
-const updateProducZodSchema = z.object({
+const updateProductZodSchema = z.object({
   body: updateProductBodySchema,
 });
 
@@ -116,7 +121,7 @@ const deleteProductsZodSchema = z.object({
 });
 
 export const ProductValidation = {
-  createProducZodSchema,
-  updateProducZodSchema,
+  createProductZodSchema,
+  updateProductZodSchema,
   deleteProductsZodSchema,
 };

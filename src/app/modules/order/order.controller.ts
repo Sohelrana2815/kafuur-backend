@@ -9,10 +9,13 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   // Utilizing your clean global Express interface
- const userId =  (req.user as JwtPayload)?.userId;
-  console.log(userId,req.body,"From controller");
+  const userId = (req.user as JwtPayload)?.userId;
+  console.log(userId, req.body, "From controller");
   if (!userId) {
-    throw new AppError(httpStatus.StatusCodes.UNAUTHORIZED, "You are not authorized");
+    throw new AppError(
+      httpStatus.StatusCodes.UNAUTHORIZED,
+      "You are not authorized",
+    );
   }
 
   const result = await OrderServices.createOrder(userId, req.body);
@@ -20,12 +23,11 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.StatusCodes.CREATED,
     success: true,
-    message: result.paymentUrl 
-      ? "Order pending. Redirecting to payment gateway..." 
+    message: result.paymentUrl
+      ? "Order pending. Redirecting to payment gateway..."
       : "Order placed successfully!",
     data: result,
   });
-  
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
@@ -39,7 +41,23 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get my orders
+
+const getMyOrders = catchAsync(async (req: Request, res: Response) => {
+  const userId = (req.user as JwtPayload)?.userId;
+  const result = await OrderServices.getMyOrders(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Orders retrieved successfully",
+    data: result.data,
+    meta: result.meta,
+  });
+});
+
 export const OrderControllers = {
   createOrder,
   getAllOrders,
+  getMyOrders,
 };

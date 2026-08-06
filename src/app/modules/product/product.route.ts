@@ -35,7 +35,7 @@ router.post(
 
     next();
   },
-  validateRequest(ProductValidation.createProducZodSchema),
+  validateRequest(ProductValidation.createProductZodSchema),
   ProductControllers.createProduct,
 );
 
@@ -70,7 +70,7 @@ router.patch(
 
     next();
   },
-  validateRequest(ProductValidation.updateProducZodSchema),
+  validateRequest(ProductValidation.updateProductZodSchema),
   ProductControllers.updateProduct,
 );
 router.get("/:slug", ProductControllers.getSingleProduct);
