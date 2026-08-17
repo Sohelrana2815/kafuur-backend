@@ -8,7 +8,7 @@ import expressSession from "express-session";
 import { router } from "./app/routes/index.js";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
 import { envVars } from "./app/config/env.js";
-import "./app/config/passport.js"
+import "./app/config/passport.js";
 import passport from "passport";
 import { PaymentRoutes } from "./app/modules/payment/payment.route.js";
 const app: Application = express();
@@ -19,15 +19,17 @@ app.use(
   }),
 );
 // ✅ 1. STRIPE WEBHOOK (Must come BEFORE express.json)
-app.use("/api/payment",PaymentRoutes)
+app.use("/api/payment", PaymentRoutes);
 app.use(express.json());
-app.use(expressSession({
-  secret: envVars.EXPRESS_SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}))
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(
+  expressSession({
+    secret: envVars.EXPRESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cookieParser());
 app.use("/api/v1", router);
 

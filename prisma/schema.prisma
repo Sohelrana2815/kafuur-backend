@@ -56,7 +56,6 @@ model AuthProvider {
 model User {
   id         String         @id @default(ulid())
   name       String?
-  username   String?        @unique
   picture    String?
   email      String         @unique
   password   String? // Bcrypt password

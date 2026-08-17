@@ -37,9 +37,9 @@ const createProductBodySchema = z.object({
 
   longDescription: z
     .string({
-      error: "Long description text block is required",
+      error: "Long is required",
     })
-    .min(20, "Long description must provide substantial item specifications"),
+    .min(20, "Description must be at least 20 characters long."),
 
   price: z
     .number({

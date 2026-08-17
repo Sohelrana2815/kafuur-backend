@@ -14,7 +14,7 @@ const createUserBodySchema = z.object({
 });
 // Login User Body Schema
 const loginUserBodySchema = z.object({
-  email: z.email("Invalid email format"),
+  email: z.email("Invalid email format").trim(),
   password: z.string({ error: "Password is required" }),
 });
 

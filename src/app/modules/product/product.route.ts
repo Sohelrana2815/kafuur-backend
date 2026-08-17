@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response, Router } from "express";
-import validateRequest from "../../middlewares/validateRequest.js"; // Leverages your core default validation layout [cite: 55]
-import auth from "../../middlewares/auth.js"; // Matches your precise auth cookie interception middleware
 import { Role } from "@prisma/client";
+import { NextFunction, Request, Response, Router } from "express";
+import { multerUpload } from "../../config/multer.config.js";
+import auth from "../../middlewares/auth.js"; // Matches your precise auth cookie interception middleware
+import validateRequest from "../../middlewares/validateRequest.js"; // Leverages your core default validation layout [cite: 55]
 import { ProductControllers } from "./product.controller.js";
 import { ProductValidation } from "./product.validation.js";
-import { multerUpload } from "../../config/multer.config.js";
 
 const router = Router();
 
@@ -40,14 +40,14 @@ router.post(
 );
 
 router.get("/", ProductControllers.getAllProducts);
-
+// DELETE PRODUCTS
 router.patch(
   "/bulk-delete",
   auth(Role.ADMIN),
   validateRequest(ProductValidation.deleteProductsZodSchema),
   ProductControllers.deleteProducts,
 );
-
+// UPDATE PRODUCT
 router.patch(
   "/:id",
   auth(Role.ADMIN),
@@ -72,6 +72,14 @@ router.patch(
   },
   validateRequest(ProductValidation.updateProductZodSchema),
   ProductControllers.updateProduct,
+);
+// HARD DELETE
+router.delete("/:id", auth(Role.ADMIN), ProductControllers.deleteProductById);
+// SOFT DELETE
+router.patch(
+  "/soft/:id",
+  auth(Role.ADMIN),
+  ProductControllers.softDeleteProductById,
 );
 router.get("/:slug", ProductControllers.getSingleProduct);
 router.get("/:id", ProductControllers.getProductById);

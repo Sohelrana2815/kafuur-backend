@@ -178,11 +178,63 @@ const deleteProducts = async (ids: string[]) => {
   return result;
 };
 
+const deleteProductById = async (id: string) => {
+  const productToDelete = await prisma.product.findUnique({
+    where: { id },
+  });
+  if(!productToDelete){
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Product not found");
+  }
+  
+
+  // Delete images from Cloudinary
+  if (productToDelete.images && productToDelete.images.length > 0) {
+    await Promise.all(productToDelete.images.map((url) => deleteImageFromCloudinary(url)));
+  }
+
+  // hard delete the product from the database
+ const result =  await prisma.product.delete({
+    where: { id },
+  });
+  return result;
+
+};
+const softDeleteProductById = async (id: string) => {
+  const productToDelete = await prisma.product.findUnique({
+    where: { id },
+  });
+
+  if (!productToDelete) {
+    throw new AppError(
+      httpStatus.StatusCodes.NOT_FOUND,
+      "Product not found"
+    );
+  }
+
+  if (productToDelete.isDeleted) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "Product is already deleted"
+    );
+  }
+
+  const result = await prisma.product.update({
+    where: { id },
+    data: {
+      isDeleted: true,
+    },
+  });
+
+  return result;
+};
+
 export const ProductServices = {
   createProduct,
   getAllProducts,
   updateProduct,
   deleteProducts,
+  deleteProductById,
+  softDeleteProductById,
   getProductById,
   getSingleProduct,
 };

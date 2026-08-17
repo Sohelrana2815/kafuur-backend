@@ -19,10 +19,10 @@ router.post(
 /**
  * Public Endpoint: Gateway used by admins to gain session credentials and enter dashboard
  */
-router.post(
-  "/login",
-  validateRequest(AdminAuthValidation.loginAdminZodSchema),
-  AdminAuthControllers.loginAdmin,
-);
+// router.post(
+//   "/login",
+//   validateRequest(AdminAuthValidation.loginAdminZodSchema),
+//   AdminAuthControllers.loginAdmin,
+// );
 
 export const AdminAuthRoutes = router;
