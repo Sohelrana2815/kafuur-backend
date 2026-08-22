@@ -28,7 +28,7 @@ export const seedAdmin = async () => {
 
     await prisma.user.create({
       data: {
-        username: "Admin",
+        name: "Admin",
         email: envVars.ADMIN_EMAIL,
         password: hashedPassword,
         role: Role.ADMIN,

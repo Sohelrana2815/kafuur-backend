@@ -15,7 +15,18 @@ router.get(
   UserControllers.getAllUsers,
 );
 
-router.post("/register",validateRequest(CreateUserValidation.createUserZodSchema), UserControllers.createUser);
+router.post(
+  "/register",
+  validateRequest(CreateUserValidation.createUserZodSchema),
+  UserControllers.createUser,
+);
+
+// Add this near your other routes in UserRoutes
+router.get(
+  "/me",
+  auth(Role.CUSTOMER, Role.ADMIN), // Both roles can view their own profile
+  UserControllers.getMyProfile,
+);
 
 // PATCH routes (ORDER IS IMPORTANT)
 

@@ -169,4 +169,5 @@ model CartItem {
 
   // This compound unique index is the secret sauce for clean design standards
   @@unique([userId, productId])
+  
 }

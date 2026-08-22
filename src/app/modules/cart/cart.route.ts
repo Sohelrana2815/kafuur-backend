@@ -22,23 +22,47 @@ router.get(
 router.post(
   "/",
   auth(Role.CUSTOMER, Role.ADMIN),
-  validateRequest(CartValidation.updateCartItemZodSchema),
-  CartControllers.updateCartItem,
+  validateRequest(CartValidation.addToCartZodSchema),
+  CartControllers.addToCart,
 );
+router.patch(
+  "/increment",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  validateRequest(CartValidation.incrementDecrementZodSchema),
+  CartControllers.incrementCartItem,
+);
+router.patch(
+  "/decrement",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  validateRequest(CartValidation.incrementDecrementZodSchema),
+  CartControllers.decrementCartItem,
+);
+// router.patch(
+//   "/",
+//   auth(Role.CUSTOMER, Role.ADMIN),
+//   validateRequest(CartValidation.updateCartItemZodSchema),
+//   CartControllers.updateCartItem,
+// );
 
 // Merge local storage cart after successful login
-router.post(
-  "/sync",
-  auth(Role.CUSTOMER, Role.ADMIN),
-  validateRequest(CartValidation.syncCartZodSchema),
-  CartControllers.syncCart,
-);
+// router.post(
+//   "/sync",
+//   auth(Role.CUSTOMER, Role.ADMIN),
+//   validateRequest(CartValidation.syncCartZodSchema),
+//   CartControllers.syncCart,
+// );
 
 // Single endpoint for both individual and bulk deletions
-router.delete(
-  "/",
-  auth(Role.CUSTOMER, Role.ADMIN),
-  CartControllers.deleteCartItems,
-);
+// router.delete(
+//   "/",
+//   auth(Role.CUSTOMER, Role.ADMIN),
+//   CartControllers.deleteCartItems,
+// );
 
+// Add this below your existing routes
+router.delete(
+  "/:id",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  CartControllers.deleteSingleCartItem,
+);
 export const CartRoutes = router;

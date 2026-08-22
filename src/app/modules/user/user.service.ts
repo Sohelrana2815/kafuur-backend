@@ -41,7 +41,7 @@ const createUser = async (payload: Prisma.UserCreateInput) => {
   });
 
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const { username, password, ...userWithoutPassword } = user;
+  const { password, ...userWithoutPassword } = user;
   return userWithoutPassword;
 };
 
@@ -66,6 +66,21 @@ const getAllUsers = async (query: Record<string, any>) => {
   };
 };
 
+const getMyProfile = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  // Exclude password from the returned data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const { password, ...userWithoutPassword } = user;
+
+  return userWithoutPassword;
+};
 const updateMyProfile = async (
   userId: string,
   payload: Prisma.UserUpdateInput,
@@ -93,7 +108,7 @@ const updateMyProfile = async (
     "isVerified",
     "isDeleted",
     "email",
-    "password"
+    "password",
   ];
   const hasRestrictedFields = restrictedFields.some((field) =>
     Object.keys(payload).includes(field),
@@ -165,6 +180,7 @@ const updateUserByAdmin = async (
 export const UserServices = {
   createUser,
   getAllUsers,
+  getMyProfile,
   updateMyProfile,
   updateUserByAdmin,
 };

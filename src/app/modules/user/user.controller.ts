@@ -26,7 +26,19 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     meta: result.meta,
   });
 });
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  // Extract userId directly from the authenticated token payload
+  const userId = (req.user as JwtPayload)?.userId || (req.user as JwtPayload)?.id;
 
+  const result = await UserServices.getMyProfile(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Profile retrieved successfully",
+    data: result,
+  });
+});
 // --- 1. CUSTOMER CONTROLLER ---
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   // Extract userId directly from the authenticated token payload
@@ -62,6 +74,7 @@ const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
 export const UserControllers = {
   createUser,
   getAllUsers,
+  getMyProfile,
   updateMyProfile,
   updateUserByAdmin,
 };
