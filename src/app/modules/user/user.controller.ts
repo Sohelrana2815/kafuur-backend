@@ -28,14 +28,14 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   // Extract userId directly from the authenticated token payload
-  const userId = (req.user as JwtPayload)?.userId || (req.user as JwtPayload)?.id;
+  const userId = (req.user as JwtPayload)?.userId;
 
   const result = await UserServices.getMyProfile(userId);
 
   sendResponse(res, {
     statusCode: httpStatus.StatusCodes.OK,
     success: true,
-    message: "Profile retrieved successfully",
+    message: "Profile information retrieved successfully",
     data: result,
   });
 });

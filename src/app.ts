@@ -14,7 +14,11 @@ import { PaymentRoutes } from "./app/modules/payment/payment.route.js";
 const app: Application = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://kafuur.vercel.app",
+      "https://kafuur.com",
+    ],
     credentials: true,
   }),
 );

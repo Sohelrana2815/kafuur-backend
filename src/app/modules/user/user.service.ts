@@ -77,7 +77,7 @@ const getMyProfile = async (userId: string) => {
 
   // Exclude password from the returned data
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  const { password, ...userWithoutPassword } = user;
+  const { id, password, ...userWithoutPassword } = user;
 
   return userWithoutPassword;
 };
