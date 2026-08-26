@@ -3,7 +3,7 @@ import httpStatus from "http-status-codes";
 import AppError from "../../errorsHelpers/AppError.js";
 import prisma from "../../lib/prisma.js";
 // Retrieve the active user's cart populated with product details
-const getCart = async (userId: string, cartItemIds?: string[]) => {
+const getCarts = async (userId: string, cartItemIds?: string[]) => {
   // --- THE FIX STARTS HERE ---
   // Replaced 'any' with the strictly typed Prisma WhereInput
   const whereCondition: Prisma.CartItemWhereInput = { userId };
@@ -201,7 +201,7 @@ const deleteSingleCartItem = async (id: string, userId: string) => {
 };
 
 export const CartServices = {
-  getCart,
+  getCarts,
   getOrderSummary,
   addToCart,
   incrementCartItem,

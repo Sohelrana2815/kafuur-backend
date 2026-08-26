@@ -7,7 +7,7 @@ import { sendResponse } from "../../utils/sendResponse.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { JwtPayload } from "jsonwebtoken";
 
-const getCart = catchAsync(async (req: Request, res: Response) => {
+const getCarts = catchAsync(async (req: Request, res: Response) => {
   const userId =
     (req.user as CustomJwtPayload)?.id ||
     (req.user as CustomJwtPayload)?.userId;
@@ -24,7 +24,7 @@ const getCart = catchAsync(async (req: Request, res: Response) => {
     : undefined;
 
   // Pass the extracted array as the second argument
-  const result = await CartServices.getCart(userId, cartItemIds);
+  const result = await CartServices.getCarts(userId, cartItemIds);
   // --- THE FIX ENDS HERE ---
 
   sendResponse(res, {
@@ -34,6 +34,7 @@ const getCart = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getOrderSummary = catchAsync(async (req: Request, res: Response) => {
   const userId = (req.user as JwtPayload)?.userId;
 
@@ -213,7 +214,7 @@ export const CartControllers = {
   decrementCartItem,
   // updateCartItem,
   // syncCart,
-  getCart,
+  getCarts,
   getOrderSummary,
   // deleteCartItems,
   deleteSingleCartItem,

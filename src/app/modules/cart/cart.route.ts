@@ -8,7 +8,7 @@ import { CartValidation } from "./cart.validation.js";
 const router = Router();
 
 // Retrieve cart data (requires login)
-router.get("/", auth(Role.CUSTOMER, Role.ADMIN), CartControllers.getCart);
+router.get("/", auth(Role.CUSTOMER, Role.ADMIN), CartControllers.getCarts);
 // router.get("/", auth(...Object(Role)), CartControllers.getCart);
 
 // Get Order summary
