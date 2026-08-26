@@ -195,8 +195,8 @@ const createOrder = async (userId: string, payload: CreateOrderPayload) => {
       payment_method_types: ["card"],
       mode: "payment",
       // success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      success_url: `${process.env.FRONTEND_URL}/payment-success`,
-      cancel_url: `${process.env.FRONTEND_URL}/checkout/cancel`,
+      success_url: `${process.env.FRONTEND_URL_PROD}/payment-success`,
+      cancel_url: `${process.env.FRONTEND_URL_PROD}/checkout/cancel`,
       customer_email: user.email,
       client_reference_id: order.id,
       expires_at: Math.floor(Date.now() / 1000) + 1 * 60 * 60, // 2 hours in Unix Epoch

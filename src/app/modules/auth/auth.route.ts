@@ -26,7 +26,7 @@ router.get("/google", (req: Request, res: Response, next: NextFunction) => {
 // 2. Add the passport middleware BEFORE your controller to process the Google login
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: `${envVars.FRONTEND_URL}/login` }),
+  passport.authenticate("google", { failureRedirect: `${envVars.FRONTEND_URL_PROD}/login` }),
   AuthControllers.googleCallbackController
 );
 

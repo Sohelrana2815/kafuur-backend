@@ -166,7 +166,7 @@ const googleCallbackController = catchAsync(
 
     // 5. REDIRECT back to the frontend instead of sending a JSON response. 
     // This is required for OAuth flows to close the loop.
-    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
+    res.redirect(`${envVars.FRONTEND_URL_PROD}/${redirectTo}`);
   },
 );
 
