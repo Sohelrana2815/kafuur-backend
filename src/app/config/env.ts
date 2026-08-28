@@ -34,4 +34,5 @@ export const envVars = {
   FRONTEND_URL: getEnv("FRONTEND_URL"),
   STRIPE_SECRET_KEY: getEnv("STRIPE_SECRET_KEY"),
   STRIPE_WEBHOOK_SECRET: getEnv("STRIPE_WEBHOOK_SECRET"),
+  DELIVERY_FEE: getEnv("DELIVERY_FEE"),
 } as const;

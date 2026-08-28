@@ -1,9 +1,11 @@
 import { Router } from "express";
 // import validateRequest from "../../middlewares/validateRequest.js";
 // import { OrderValidation } from "./order.validation.js";
-import { OrderControllers } from "./order.controller.js";
-import auth from "../../middlewares/auth.js";
 import { Role } from "@prisma/client";
+import auth from "../../middlewares/auth.js";
+import validateRequest from "../../middlewares/validateRequest.js";
+import { OrderControllers } from "./order.controller.js";
+import { OrderValidation } from "./order.validation.js";
 // import auth from "../../middlewares/auth.js"; // Import if protecting route
 
 const router = Router();
@@ -16,8 +18,8 @@ const router = Router();
 router.post(
   "/",
   auth(Role.CUSTOMER, Role.ADMIN),
-  // auth("CUSTOMER", "ADMIN"), // Uncomment to enforce login before buying
-  // validateRequest(OrderValidation.createOrderZodSchema),
+  auth("CUSTOMER", "ADMIN"), // Uncomment to enforce login before buying
+  validateRequest(OrderValidation.createOrderZodSchema),
   OrderControllers.createOrder,
 );
 
@@ -27,3 +29,4 @@ export const OrderRoutes = router;
 
 // GET /api/orders/my-orders
 router.get("/my-orders", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getMyOrders);
+router.get("/:id", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getOrderById);

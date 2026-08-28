@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from "express";
+import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import AppError from "../../errorsHelpers/AppError.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
-import httpStatus from "http-status-codes";
 import { OrderServices } from "./order.service.js";
-import AppError from "../../errorsHelpers/AppError.js";
-import { JwtPayload } from "jsonwebtoken";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   // Utilizing your clean global Express interface
@@ -56,8 +56,24 @@ const getMyOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOrderById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const user = req.user as JwtPayload;
+
+  const result = await OrderServices.getOrderById(id as string, user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Order details retrieved successfully.",
+    data: result,
+  });
+});
+
 export const OrderControllers = {
   createOrder,
   getAllOrders,
   getMyOrders,
+  getOrderById,
 };
