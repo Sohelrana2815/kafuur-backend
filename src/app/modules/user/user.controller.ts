@@ -83,6 +83,20 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const deleteUserById = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+
+  const result = await UserServices.deleteUserById(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "User deleted successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createUser,
   getAllUsers,
@@ -90,4 +104,5 @@ export const UserControllers = {
   updateMyProfile,
   updateUserByAdmin,
   getUserById,
+  deleteUserById
 };

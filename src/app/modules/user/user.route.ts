@@ -45,6 +45,11 @@ router.patch(
 // Only ADMIN is authorized to hit this parameter-based route
 router.patch("/:id", auth(Role.ADMIN), UserControllers.updateUserByAdmin);
 
+router.delete(
+  "/:id",
+  auth(Role.ADMIN),
+  UserControllers.deleteUserById
+);
 export const UserRoutes = router;
 
 // /api/v1/users/register

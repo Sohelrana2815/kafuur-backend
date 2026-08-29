@@ -2,8 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/utils/QueryBuilder.ts
 
-
-
 export class QueryBuilder<T extends { findMany: any; count: any }> {
   public model: T;
   public query: Record<string, any>;
@@ -117,10 +115,15 @@ export class QueryBuilder<T extends { findMany: any; count: any }> {
   /**
    * Executes findMany with accumulated configurations
    */
-  build() {
-    return this.model.findMany(this.prismaQuery);
+  // build() {
+  //   return this.model.findMany(this.prismaQuery);
+  // }
+  build(extraArgs: Record<string, any> = {}) {
+    return this.model.findMany({
+      ...this.prismaQuery,
+      ...extraArgs,
+    });
   }
-
   /**
    * Returns exact pagination metadata
    */

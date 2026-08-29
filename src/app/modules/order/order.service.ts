@@ -10,6 +10,8 @@ import AppError from "../../errorsHelpers/AppError.js";
 import prisma from "../../lib/prisma.js";
 import { CreateOrderPayload } from "./order.interface.js";
 import { JwtPayload } from "jsonwebtoken";
+import { QueryBuilder } from "../../utils/QueryBuilder.js";
+import { orderSearchableFields } from "./order.constant.js";
 
 // Initialize Stripe with your Secret Key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -155,15 +157,37 @@ const createOrder = async (userId: string, payload: CreateOrderPayload) => {
   return { order, paymentUrl: null };
 };
 
-const getAllOrders = async () => {
-  return await prisma.order.findMany({
-    include: {
-      orderItems: {
-        include: { product: true },
-      },
-    },
-    orderBy: { createdAt: "desc" },
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getAllOrders = async (query: Record<string, any>) => {
+  const queryBuilder = new QueryBuilder(prisma.order, {
+    ...query,
   });
+
+  const ordersQuery = queryBuilder
+    .search(orderSearchableFields)
+    .filter()
+    .sort()
+    .fields()
+    .paginate();
+
+  // Concurrently fetch catalog payload data and total counter metadata
+  const [data, meta] = await Promise.all([
+    // Pass the relations to your builder so the dashboard receives the full order details
+    ordersQuery.build({
+      include: {
+        user: true,
+        orderItems: {
+          include: { product: true },
+        },
+      },
+    }),
+    queryBuilder.getMeta(),
+  ]);
+
+  return {
+    data,
+    meta,
+  };
 };
 
 // Get My Orders

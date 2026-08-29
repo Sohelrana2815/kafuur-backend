@@ -193,6 +193,34 @@ const getUserById = async (userId: string) => {
   return userWithoutPassword;
 };
 
+const deleteUserById = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  if (user.status==="DELETED") {
+    throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "User is already deleted");
+  }
+
+  // Soft Delete: update isDeleted and status
+  const deletedUser = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      status: "DELETED", 
+    },
+  });
+
+  // Exclude password from the returned data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const { password, ...userWithoutPassword } = deletedUser;
+
+  return userWithoutPassword;
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
@@ -200,4 +228,5 @@ export const UserServices = {
   updateMyProfile,
   updateUserByAdmin,
   getUserById,
+  deleteUserById
 };
