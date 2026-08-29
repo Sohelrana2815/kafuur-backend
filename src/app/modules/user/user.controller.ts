@@ -71,10 +71,23 @@ const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserById = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+
+  const result = await UserServices.getUserById(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "User retrieved successfully",
+    data: result,
+  });
+});
 export const UserControllers = {
   createUser,
   getAllUsers,
   getMyProfile,
   updateMyProfile,
   updateUserByAdmin,
+  getUserById,
 };

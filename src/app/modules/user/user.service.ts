@@ -177,10 +177,27 @@ const updateUserByAdmin = async (
   return userWithoutPassword;
 };
 
+const getUserById = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
+  }
+
+  // Exclude password from the returned data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const { password, ...userWithoutPassword } = user;
+
+  return userWithoutPassword;
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
   getMyProfile,
   updateMyProfile,
   updateUserByAdmin,
+  getUserById,
 };

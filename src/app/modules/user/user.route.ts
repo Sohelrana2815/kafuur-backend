@@ -28,6 +28,8 @@ router.get(
   UserControllers.getMyProfile,
 );
 
+// Admin fetches a single user by ID (MUST be below /me)
+router.get("/:id", auth(Role.ADMIN), UserControllers.getUserById);
 // PATCH routes (ORDER IS IMPORTANT)
 
 // 1. Customer updates their own profile
