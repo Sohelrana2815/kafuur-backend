@@ -1,7 +1,12 @@
 export const orderSearchableFields = [
-  "customerName", 
-  "email", 
-  "phone", 
-  "transactionId", 
-  "city"
+  "id",
+  "customerName",
+  "email",
+  "phone",
+  "altPhone",
+  "address",
+  "city",
+  "thana",
+  "transactionId",
+  "stripeSessionId",
 ];
