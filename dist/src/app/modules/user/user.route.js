@@ -11,6 +11,8 @@ router.post("/register", validateRequest(CreateUserValidation.createUserZodSchem
 // Add this near your other routes in UserRoutes
 router.get("/me", auth(Role.CUSTOMER, Role.ADMIN), // Both roles can view their own profile
 UserControllers.getMyProfile);
+// Admin fetches a single user by ID (MUST be below /me)
+router.get("/:id", auth(Role.ADMIN), UserControllers.getUserById);
 // PATCH routes (ORDER IS IMPORTANT)
 // 1. Customer updates their own profile
 // Both ADMIN and CUSTOMER can have a profile they want to update
@@ -18,5 +20,6 @@ router.patch("/me", auth(Role.CUSTOMER, Role.ADMIN), validateRequest(UpdateProfi
 // 2. Admin updates another user's profile
 // Only ADMIN is authorized to hit this parameter-based route
 router.patch("/:id", auth(Role.ADMIN), UserControllers.updateUserByAdmin);
+router.delete("/:id", auth(Role.ADMIN), UserControllers.deleteUserById);
 export const UserRoutes = router;
 // /api/v1/users/register

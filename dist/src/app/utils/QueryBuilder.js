@@ -104,8 +104,14 @@ export class QueryBuilder {
     /**
      * Executes findMany with accumulated configurations
      */
-    build() {
-        return this.model.findMany(this.prismaQuery);
+    // build() {
+    //   return this.model.findMany(this.prismaQuery);
+    // }
+    build(extraArgs = {}) {
+        return this.model.findMany({
+            ...this.prismaQuery,
+            ...extraArgs,
+        });
     }
     /**
      * Returns exact pagination metadata

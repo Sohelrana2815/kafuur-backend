@@ -3,7 +3,7 @@ import AppError from "../../errorsHelpers/AppError.js";
 import { CartServices } from "./cart.service.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { catchAsync } from "../../utils/catchAsync.js";
-const getCart = catchAsync(async (req, res) => {
+const getCarts = catchAsync(async (req, res) => {
     const userId = req.user?.id ||
         req.user?.userId;
     if (!userId) {
@@ -15,7 +15,7 @@ const getCart = catchAsync(async (req, res) => {
         ? req.query.ids.split(",")
         : undefined;
     // Pass the extracted array as the second argument
-    const result = await CartServices.getCart(userId, cartItemIds);
+    const result = await CartServices.getCarts(userId, cartItemIds);
     // --- THE FIX ENDS HERE ---
     sendResponse(res, {
         statusCode: httpStatus.StatusCodes.OK,
@@ -164,7 +164,7 @@ export const CartControllers = {
     decrementCartItem,
     // updateCartItem,
     // syncCart,
-    getCart,
+    getCarts,
     getOrderSummary,
     // deleteCartItems,
     deleteSingleCartItem,

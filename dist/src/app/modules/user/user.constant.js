@@ -1,10 +1,9 @@
 export const userSearchableFields = [
     "email",
-    "username",
-    "fullName",
+    "name",
     "phone",
     "altPhone",
-    "address",
     "thana",
     "city",
+    "address",
 ];

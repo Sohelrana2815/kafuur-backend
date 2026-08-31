@@ -58,10 +58,32 @@ const updateUserByAdmin = catchAsync(async (req, res) => {
         data: result,
     });
 });
+const getUserById = catchAsync(async (req, res) => {
+    const userId = req.params.id;
+    const result = await UserServices.getUserById(userId);
+    sendResponse(res, {
+        statusCode: httpStatus.StatusCodes.OK,
+        success: true,
+        message: "User retrieved successfully",
+        data: result,
+    });
+});
+const deleteUserById = catchAsync(async (req, res) => {
+    const userId = req.params.id;
+    const result = await UserServices.deleteUserById(userId);
+    sendResponse(res, {
+        statusCode: httpStatus.StatusCodes.OK,
+        success: true,
+        message: "User deleted successfully",
+        data: result,
+    });
+});
 export const UserControllers = {
     createUser,
     getAllUsers,
     getMyProfile,
     updateMyProfile,
     updateUserByAdmin,
+    getUserById,
+    deleteUserById
 };

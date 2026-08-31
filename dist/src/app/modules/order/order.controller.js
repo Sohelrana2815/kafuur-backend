@@ -1,8 +1,8 @@
+import httpStatus from "http-status-codes";
+import AppError from "../../errorsHelpers/AppError.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { sendResponse } from "../../utils/sendResponse.js";
-import httpStatus from "http-status-codes";
 import { OrderServices } from "./order.service.js";
-import AppError from "../../errorsHelpers/AppError.js";
 const createOrder = catchAsync(async (req, res) => {
     // Utilizing your clean global Express interface
     const userId = req.user?.userId;
@@ -21,12 +21,13 @@ const createOrder = catchAsync(async (req, res) => {
     });
 });
 const getAllOrders = catchAsync(async (req, res) => {
-    const result = await OrderServices.getAllOrders();
+    const result = await OrderServices.getAllOrders(req.query);
     sendResponse(res, {
         statusCode: httpStatus.StatusCodes.OK,
         success: true,
         message: "Orders retrieved successfully",
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 // Get my orders
@@ -41,8 +42,20 @@ const getMyOrders = catchAsync(async (req, res) => {
         meta: result.meta,
     });
 });
+const getOrderById = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const user = req.user;
+    const result = await OrderServices.getOrderById(id, user);
+    sendResponse(res, {
+        statusCode: httpStatus.StatusCodes.OK,
+        success: true,
+        message: "Order details retrieved successfully.",
+        data: result,
+    });
+});
 export const OrderControllers = {
     createOrder,
     getAllOrders,
     getMyOrders,
+    getOrderById,
 };
