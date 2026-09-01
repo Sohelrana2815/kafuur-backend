@@ -143,8 +143,16 @@ const getAllOrders = async (query) => {
     const [data, meta] = await Promise.all([
         // Pass the relations to your builder so the dashboard receives the full order details
         ordersQuery.build({
+            omit: {
+                stripeSessionId: true,
+            },
             include: {
-                user: true,
+                user: {
+                    omit: {
+                        password: true,
+                        id: true,
+                    },
+                },
                 orderItems: {
                     include: { product: true },
                 },

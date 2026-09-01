@@ -4,14 +4,14 @@
 
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import Stripe from "stripe";
 import { envVars } from "../../config/env.js";
 import AppError from "../../errorsHelpers/AppError.js";
 import prisma from "../../lib/prisma.js";
-import { CreateOrderPayload } from "./order.interface.js";
-import { JwtPayload } from "jsonwebtoken";
 import { QueryBuilder } from "../../utils/QueryBuilder.js";
 import { orderSearchableFields } from "./order.constant.js";
+import { CreateOrderPayload } from "./order.interface.js";
 
 // Initialize Stripe with your Secret Key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -174,8 +174,17 @@ const getAllOrders = async (query: Record<string, any>) => {
   const [data, meta] = await Promise.all([
     // Pass the relations to your builder so the dashboard receives the full order details
     ordersQuery.build({
+      omit: {
+        stripeSessionId: true,
+      },
+
       include: {
-        user: true,
+        user: {
+          omit: {
+            password: true,
+            id: true,
+          },
+        },
         orderItems: {
           include: { product: true },
         },
