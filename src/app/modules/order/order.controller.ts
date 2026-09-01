@@ -72,9 +72,41 @@ const getOrderById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateOrderAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await OrderServices.updateOrderAdmin(id as string, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Order updated successfully by Admin.",
+    data: result,
+  });
+});
+
+const updateMyOrder = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userId = (req.user as JwtPayload)?.userId;
+
+  const result = await OrderServices.updateMyOrder(
+    id as string,
+    userId,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.StatusCodes.OK,
+    success: true,
+    message: "Order updated successfully.",
+    data: result,
+  });
+});
 export const OrderControllers = {
   createOrder,
   getAllOrders,
   getMyOrders,
   getOrderById,
+  updateOrderAdmin,
+  updateMyOrder,
 };

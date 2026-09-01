@@ -1,3 +1,4 @@
+
 export const orderSearchableFields = [
   "id",
   "customerName",
@@ -10,3 +11,4 @@ export const orderSearchableFields = [
   "transactionId",
   "stripeSessionId",
 ];
+

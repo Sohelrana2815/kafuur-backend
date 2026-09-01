@@ -10,11 +10,6 @@ import { OrderValidation } from "./order.validation.js";
 
 const router = Router();
 
-/**
- * @route   POST /api/orders
- * @desc    Creates a new customer order and linked order items
- * @access  Public (Guest Checkout) or Private
- */
 router.post(
   "/",
   auth(Role.CUSTOMER, Role.ADMIN),
@@ -25,8 +20,32 @@ router.post(
 
 // Add this to your order.route.ts
 router.get("/", auth(Role.ADMIN), OrderControllers.getAllOrders);
-export const OrderRoutes = router;
 
 // GET /api/orders/my-orders
-router.get("/my-orders", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getMyOrders);
-router.get("/:id", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getOrderById);
+router.get(
+  "/my-orders",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  OrderControllers.getMyOrders,
+);
+router.get(
+  "/:id",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  OrderControllers.getOrderById,
+);
+// Customer update route (Cancel or update delivery address before processing)
+router.patch(
+  "/my-orders/:id",
+  auth(Role.CUSTOMER, Role.ADMIN),
+  validateRequest(OrderValidation.updateOrderCustomerZodSchema),
+  OrderControllers.updateMyOrder,
+);
+
+// Admin update route (Status updates, payment status adjustments, logistics)
+router.patch(
+  "/:id",
+  auth(Role.ADMIN),
+  validateRequest(OrderValidation.updateOrderAdminZodSchema),
+  OrderControllers.updateOrderAdmin,
+);
+
+export const OrderRoutes = router;

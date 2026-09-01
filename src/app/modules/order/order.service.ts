@@ -2,7 +2,7 @@
  * Safely processes a new customer order, calculating prices directly from the DB.
  */
 
-import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { OrderStatus, PaymentStatus, Prisma } from "@prisma/client";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import Stripe from "stripe";
@@ -12,6 +12,7 @@ import prisma from "../../lib/prisma.js";
 import { QueryBuilder } from "../../utils/QueryBuilder.js";
 import { orderSearchableFields } from "./order.constant.js";
 import { CreateOrderPayload } from "./order.interface.js";
+import { ALLOWED_ORDER_TRANSITIONS } from "../../utils/orderTransition.js";
 
 // Initialize Stripe with your Secret Key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -254,9 +255,129 @@ const getOrderById = async (orderId: string, user: JwtPayload) => {
   return order;
 };
 
+const updateOrderAdmin = async (
+  orderId: string,
+  payload: Prisma.OrderUpdateInput,
+) => {
+  const existingOrder = await prisma.order.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!existingOrder) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Order not found");
+  }
+
+  // Validate order status transition if status is being updated
+  if (payload.status && payload.status !== existingOrder.status) {
+    const nextStatus = payload.status as OrderStatus;
+    const allowedNextStatuses = ALLOWED_ORDER_TRANSITIONS[existingOrder.status];
+
+    if (!allowedNextStatuses.includes(nextStatus)) {
+      throw new AppError(
+        httpStatus.StatusCodes.BAD_REQUEST,
+        `Invalid status transition from '${existingOrder.status}' to '${nextStatus}'.`,
+      );
+    }
+    // Auto-Sync: If COD order is marked DELIVERED, automatically set payment to PAID
+    if (
+      nextStatus === OrderStatus.DELIVERED &&
+      existingOrder.paymentMethod === "COD" &&
+      existingOrder.paymentStatus === PaymentStatus.UNPAID
+    ) {
+      payload.paymentStatus = PaymentStatus.PAID;
+    }
+  }
+  // 2. Validate Payment Status Updates
+  if (
+    payload.paymentStatus &&
+    payload.paymentStatus !== existingOrder.paymentStatus
+  ) {
+    const nextPaymentStatus = payload.paymentStatus as PaymentStatus;
+
+    // Rule: Cannot refund an order unless it was previously paid
+    if (nextPaymentStatus === PaymentStatus.REFUNDED) {
+      if (existingOrder.paymentStatus !== PaymentStatus.PAID) {
+        throw new AppError(
+          httpStatus.StatusCodes.BAD_REQUEST,
+          "Cannot mark as REFUNDED because the order is not PAID.",
+        );
+      }
+
+      // Auto-Sync: If refunded, ensure the order is marked as CANCELLED
+      if (!payload.status && existingOrder.status !== OrderStatus.CANCELLED) {
+        payload.status = OrderStatus.CANCELLED;
+      }
+    }
+  }
+
+  return await prisma.order.update({
+    where: { id: orderId },
+    data: payload,
+  });
+};
+
+// Customer: Restricted updates allowed ONLY when order is PENDING
+const updateMyOrder = async (
+  orderId: string,
+  userId: string,
+  payload: Prisma.OrderUpdateInput,
+) => {
+  const existingOrder = await prisma.order.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!existingOrder) {
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Order not found");
+  }
+
+  if (existingOrder.userId !== userId) {
+    throw new AppError(
+      httpStatus.StatusCodes.FORBIDDEN,
+      "You do not have permission to modify this order",
+    );
+  }
+
+  // Lifecycle Rule Enforcement: Customer can only alter PENDING orders
+  if (existingOrder.status !== OrderStatus.PENDING) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      `Order cannot be updated once it is ${existingOrder.status.toLowerCase()}`,
+    );
+  }
+
+  // Secondary Guard: Explicitly restrict modifications to safe fields
+  const allowedCustomerFields = [
+    "status",
+    // "altPhone",
+    // "address",
+    // "city",
+    // "thana",
+  ];
+  const payloadKeys = Object.keys(payload);
+  const containsRestrictedFields = payloadKeys.some(
+    (key) => !allowedCustomerFields.includes(key),
+  );
+
+  if (containsRestrictedFields) {
+    throw new AppError(
+      httpStatus.StatusCodes.BAD_REQUEST,
+      "You are trying to update restricted fields.",
+    );
+  }
+
+  const updatedOrder = await prisma.order.update({
+    where: { id: orderId },
+    data: payload,
+  });
+
+  return updatedOrder;
+};
+
 export const OrderServices = {
   createOrder,
   getAllOrders,
   getMyOrders,
   getOrderById,
+  updateOrderAdmin,
+  updateMyOrder,
 };
