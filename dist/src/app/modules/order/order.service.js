@@ -218,31 +218,51 @@ const updateOrderAdmin = async (orderId, payload) => {
     if (!existingOrder) {
         throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Order not found");
     }
-    // Validate order status transition if status is being updated
+    // Determine the resulting statuses after this update is applied
+    const nextOrderStatus = payload.status || existingOrder.status;
+    // 1. ORDER STATUS VALIDATIONS
     if (payload.status && payload.status !== existingOrder.status) {
-        const nextStatus = payload.status;
         const allowedNextStatuses = ALLOWED_ORDER_TRANSITIONS[existingOrder.status];
-        if (!allowedNextStatuses.includes(nextStatus)) {
-            throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, `Invalid status transition from '${existingOrder.status}' to '${nextStatus}'.`);
+        if (!allowedNextStatuses.includes(payload.status)) {
+            throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, `Invalid status transition from '${existingOrder.status}' to '${payload.status}'.`);
+        }
+        // Guard: Prevent fulfillment of ONLINE orders if payment is not PAID
+        if (existingOrder.paymentMethod === "ONLINE" &&
+            ["PROCESSING", "SHIPPED", "DELIVERED"].includes(payload.status) &&
+            existingOrder.paymentStatus !== PaymentStatus.PAID) {
+            throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, `Cannot transition to ${payload.status} for ONLINE orders unless payment is PAID.`);
         }
         // Auto-Sync: If COD order is marked DELIVERED, automatically set payment to PAID
-        if (nextStatus === OrderStatus.DELIVERED &&
+        if (payload.status === OrderStatus.DELIVERED &&
             existingOrder.paymentMethod === "COD" &&
             existingOrder.paymentStatus === PaymentStatus.UNPAID) {
             payload.paymentStatus = PaymentStatus.PAID;
         }
     }
-    // 2. Validate Payment Status Updates
+    // 2. PAYMENT STATUS VALIDATIONS
     if (payload.paymentStatus &&
         payload.paymentStatus !== existingOrder.paymentStatus) {
-        const nextPaymentStatus = payload.paymentStatus;
-        // Rule: Cannot refund an order unless it was previously paid
-        if (nextPaymentStatus === PaymentStatus.REFUNDED) {
+        // Guard: Prevent manual COD payment updates before delivery
+        if (existingOrder.paymentMethod === "COD" &&
+            payload.paymentStatus === PaymentStatus.PAID &&
+            nextOrderStatus !== OrderStatus.DELIVERED) {
+            throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "COD payments can only be marked as PAID when the order status is DELIVERED.");
+        }
+        // 🚨 UPDATED GUARD: Prevent downgrading ANY successful payment (both COD and ONLINE)
+        if (existingOrder.paymentStatus === PaymentStatus.PAID &&
+            ["UNPAID", "FAILED"].includes(payload.paymentStatus)) {
+            throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "Cannot manually downgrade a PAID order to UNPAID or FAILED.");
+        }
+        // Guard: Validate Refund Rules
+        if (payload.paymentStatus === PaymentStatus.REFUNDED) {
             if (existingOrder.paymentStatus !== PaymentStatus.PAID) {
                 throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "Cannot mark as REFUNDED because the order is not PAID.");
             }
-            // Auto-Sync: If refunded, ensure the order is marked as CANCELLED
-            if (!payload.status && existingOrder.status !== OrderStatus.CANCELLED) {
+            // Auto-Sync: Ensure the order is CANCELLED if refunded (unless already DELIVERED)
+            // Note: If a DELIVERED item is refunded, we leave the order status as DELIVERED
+            // because 'CANCELLED' is not a valid transition from 'DELIVERED'.
+            if (nextOrderStatus !== OrderStatus.CANCELLED &&
+                existingOrder.status !== OrderStatus.DELIVERED) {
                 payload.status = OrderStatus.CANCELLED;
             }
         }
@@ -252,7 +272,6 @@ const updateOrderAdmin = async (orderId, payload) => {
         data: payload,
     });
 };
-// Customer: Restricted updates allowed ONLY when order is PENDING
 const updateMyOrder = async (orderId, userId, payload) => {
     const existingOrder = await prisma.order.findUnique({
         where: { id: orderId },

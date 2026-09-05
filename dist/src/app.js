@@ -20,7 +20,7 @@ app.use(cors({
     credentials: true,
 }));
 // ✅ 1. STRIPE WEBHOOK (Must come BEFORE express.json)
-app.use("/api/payment", PaymentRoutes);
+app.use("/api/v1/payment", PaymentRoutes);
 app.use(express.json());
 app.use(expressSession({
     secret: envVars.EXPRESS_SESSION_SECRET,
