@@ -95,7 +95,7 @@ const updateProductBodySchema = z.object({
 
   // These handle your image adding/removing logic
   deleteImages: z.array(z.url({ message: "Must be a valid URL" })).optional(),
-
+// Cloudinary URL strings are valid URLs, so z.url() is the correct strict check here
   newImages: z.array(z.url()).optional(),
 });
 
