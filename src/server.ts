@@ -9,63 +9,61 @@ import { seedAdmin } from "./app/utils/seedAdmin.js";
 let server: Server;
 
 const startServer = async () => {
-    try {
-        await prisma.$connect();
-        console.log("🐘 Database connected successfully with Prisma 7!");
+  try {
+    await prisma.$connect();
+    console.log("🐘 Database connected successfully with Prisma 7!");
 
-        // 3. Run the admin seeding logic
+    // 3. Run the admin seeding logic
 
-        await seedAdmin();
+    await seedAdmin();
 
-        server = app.listen(envVars.PORT, () => {
-            console.log(`🚀 Server running on port ${envVars.PORT}`);
-        });
-    } catch (error) {
-        console.error("❌ DB Connection Error:", error);
-        process.exit(1);
-    }
+    server = app.listen(envVars.PORT, () => {
+      console.log(`🚀 Server running on port ${envVars.PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ DB Connection Error:", error);
+    process.exit(1);
+  }
 };
 
-
-
 (async () => {
-    try {
-        await startServer();
-    } catch (error) {
-        console.error("❌ Startup failed:", error);
-        process.exit(1);
-    }
+  try {
+    await startServer();
+  } catch (error) {
+    console.error("❌ Startup failed:", error);
+    process.exit(1);
+  }
 })();
 
 process.on("uncaughtException", (err) => {
-    console.log("Uncaught Exception error, Shutting down the server...", err);
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    }
+  console.log("Uncaught Exception error, Shutting down the server...", err);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
 
-    process.exit(1);
+  process.exit(1);
 });
 
 process.on("unhandledRejection", (err) => {
-    console.log("Unhandled Rejection Detected Server Shutting down...", err);
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    }
-    process.exit(1);
+  console.log("Unhandled Rejection Detected Server Shutting down...", err);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
 });
 
 process.on("SIGTERM", () => {
-    console.log("SIGTERM signal received. Server shutting down...");
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    }
-    process.exit(1);
+  console.log("SIGTERM signal received. Server shutting down...");
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
 });
 
 /**

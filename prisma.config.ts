@@ -12,7 +12,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // We use bracket notation to ensure TypeScript doesn't 
+    // We use bracket notation to ensure TypeScript doesn't
     // complain if the environment variable is missing during build time
     url: process.env["DATABASE_URL"] ?? "",
   },

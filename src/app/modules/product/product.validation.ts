@@ -8,25 +8,13 @@ const createProductBodySchema = z.object({
     .min(3, "Product name is too short!")
     .max(100, "Product name is too long"),
 
-  // slug: z
-  //   .string({
-  //     error: "Product slug is required",
-  //   })
-  //   .min(5, "Slug is too short!")
-  //   .regex(
-  //     /^[a-z0-9-]+$/,
-  //     "Slug must be URL-safe (lowercase letters, numbers, and hyphens only)",
-  //   ),
-
   images: z
     .array(
       z.string({
         error: "Each image asset path must be a valid string path or URL",
       }),
     )
-    .nonempty({
-      message: "At least one product image is required",
-    }),
+    .optional(),
 
   shortDescription: z
     .string({
@@ -47,11 +35,9 @@ const createProductBodySchema = z.object({
     })
     .positive("Price must be a positive currency amount greater than 0"),
 
-   category: z
-  .enum(["MEN", "WOMEN"], {
+  category: z.enum(["MEN", "WOMEN"], {
     error: "Category must be either MEN or WOMEN",
-  })
- 
+  }),
 });
 
 // Future Proofing: Update schema where all properties are optional
@@ -88,14 +74,14 @@ const updateProductBodySchema = z.object({
     .optional(),
 
   category: z
-  .enum(["MEN", "WOMEN"], {
-    error: "Category must be either MEN or WOMEN",
-  })
-  .optional(),
+    .enum(["MEN", "WOMEN"], {
+      error: "Category must be either MEN or WOMEN",
+    })
+    .optional(),
 
   // These handle your image adding/removing logic
   deleteImages: z.array(z.url({ message: "Must be a valid URL" })).optional(),
-// Cloudinary URL strings are valid URLs, so z.url() is the correct strict check here
+  // Cloudinary URL strings are valid URLs, so z.url() is the correct strict check here
   newImages: z.array(z.url()).optional(),
 });
 
