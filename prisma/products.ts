@@ -1,6 +1,7 @@
 // Use Prisma.ProductCreateManyInput for strict type checking
 import { Category, Prisma } from "@prisma/client";
 export const mockProducts: Prisma.ProductCreateManyInput[] = [
+  // --- MEN'S CATEGORY ---
   {
     name: "Fogg Master Fragrance Body Spray Agar For Men 120ml",
     slug: "fogg-master-fragrance-body-spray-agar-for-men-120ml",
@@ -9,96 +10,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     longDescription:
       "Fogg Master Agar is a masculine body spray designed for everyday freshness with a deep and aromatic fragrance profile.",
     price: "530",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Master Fragrance Body Spray Cedar For Men 120ml",
-    slug: "fogg-master-fragrance-body-spray-cedar-for-men-120ml",
-    images: [],
-    shortDescription: "Woody cedar fragrance with a masculine finish",
-    longDescription:
-      "Fogg Master Cedar offers a woody fragrance character suitable for daily wear, office hours, and casual outings.",
-    price: "530",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Master Fragrance Body Spray Pine For Men 120ml",
-    slug: "fogg-master-fragrance-body-spray-pine-for-men-120ml",
-    images: [],
-    shortDescription: "Fresh pine-inspired masculine fragrance",
-    longDescription:
-      "Fogg Master Pine delivers a fresh and energetic fragrance profile made for men who prefer a crisp everyday scent.",
-    price: "530",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Master Fragrance Body Spray Marco Intense For Men 120ml",
-    slug: "fogg-master-fragrance-body-spray-marco-intense-for-men-120ml",
-    images: [],
-    shortDescription: "Intense masculine fragrance for daily use",
-    longDescription:
-      "Fogg Master Marco Intense combines a bold fragrance profile with the convenience of a daily body spray.",
-    price: "530",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Master Fragrance Body Spray Napoleon Intense For Men 120ml",
-    slug: "fogg-master-fragrance-body-spray-napoleon-intense-for-men-120ml",
-    images: [],
-    shortDescription: "Bold and powerful fragrance for men",
-    longDescription:
-      "Fogg Master Napoleon Intense is a strong masculine body spray suitable for everyday use and evening occasions.",
-    price: "530",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Fragrance Body Spray for Men Fresh Woody 120ml",
-    slug: "fogg-fragrance-body-spray-for-men-fresh-woody-120ml",
-    images: [],
-    shortDescription: "Fresh woody fragrance for everyday wear",
-    longDescription:
-      "Fogg Fresh Woody provides a clean woody fragrance profile that works well for everyday activities and casual occasions.",
-    price: "555",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Fragrance Body Spray for Men Fresh Aqua 120ml",
-    slug: "fogg-fragrance-body-spray-for-men-fresh-aqua-120ml",
-    images: [],
-    shortDescription: "Cool aquatic fragrance with a fresh feel",
-    longDescription:
-      "Fogg Fresh Aqua offers an aquatic and refreshing scent profile designed for men who enjoy clean and energetic fragrances.",
-    price: "555",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Fragrance Body Spray for Men Fresh Oriental 120ml",
-    slug: "fogg-fragrance-body-spray-for-men-fresh-oriental-120ml",
-    images: [],
-    shortDescription: "Warm oriental fragrance for men",
-    longDescription:
-      "Fogg Fresh Oriental brings a warm and distinctive oriental-inspired scent suitable for regular and evening wear.",
-    price: "555",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Fragrance Body Spray Imperial For Men 120ml",
-    slug: "fogg-fragrance-body-spray-imperial-for-men-120ml",
-    images: [],
-    shortDescription: "Classic masculine fragrance for everyday use",
-    longDescription:
-      "Fogg Imperial is a masculine body spray with a classic fragrance profile designed for regular daily wear.",
-    price: "520",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Fragrance Body Spray Royal For Men 120ml",
-    slug: "fogg-fragrance-body-spray-royal-for-men-120ml",
-    images: [],
-    shortDescription: "Elegant fragrance with a bold masculine character",
-    longDescription:
-      "Fogg Royal offers a refined masculine fragrance profile suitable for everyday wear, social events, and special occasions.",
-    price: "520",
     category: Category.MEN,
   },
   {
@@ -112,46 +23,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     category: Category.MEN,
   },
   {
-    name: "Fogg Scent Fame For Men 100ml",
-    slug: "fogg-scent-fame-for-men-100ml",
-    images: [],
-    shortDescription: "Stylish long-lasting fragrance for men",
-    longDescription:
-      "Fogg Scent Fame delivers a sophisticated masculine fragrance profile designed for confident everyday and evening wear.",
-    price: "1500",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Scent Dazzle For Men 100ml",
-    slug: "fogg-scent-dazzle-for-men-100ml",
-    images: [],
-    shortDescription: "Distinctive fragrance for confident occasions",
-    longDescription:
-      "Fogg Scent Dazzle is a modern men's fragrance intended for regular use and occasions where a more noticeable scent is desired.",
-    price: "1500",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Scent Impressio For Men 100ml",
-    slug: "fogg-scent-impressio-for-men-100ml",
-    images: [],
-    shortDescription: "Sophisticated fragrance with a modern character",
-    longDescription:
-      "Fogg Scent Impressio is a men's perfume with a polished fragrance profile suitable for office wear, outings, and evening events.",
-    price: "1400",
-    category: Category.MEN,
-  },
-  {
-    name: "Fogg Scent Intensio For Men 100ml",
-    slug: "fogg-scent-intensio-for-men-100ml",
-    images: [],
-    shortDescription: "Intense fragrance for evening and daily wear",
-    longDescription:
-      "Fogg Scent Intensio offers a stronger masculine fragrance character suited to men who prefer a bold and noticeable scent.",
-    price: "1400",
-    category: Category.MEN,
-  },
-  {
     name: "Park Avenue Corsica Cool Premium Perfume 120ml",
     slug: "park-avenue-corsica-cool-premium-perfume-120ml",
     images: [],
@@ -159,36 +30,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     longDescription:
       "Park Avenue Corsica Cool is a refreshing men's fragrance with a clean character suited to everyday and warm-weather use.",
     price: "440",
-    category: Category.MEN,
-  },
-  {
-    name: "Park Avenue Voyage Amazon Woods Perfume 120ml",
-    slug: "park-avenue-voyage-amazon-woods-perfume-120ml",
-    images: [],
-    shortDescription: "Woody fragrance inspired by the outdoors",
-    longDescription:
-      "Park Avenue Voyage Amazon Woods delivers a woody fragrance character designed for men who enjoy an earthy and fresh scent.",
-    price: "440",
-    category: Category.MEN,
-  },
-  {
-    name: "Park Avenue Signature Collection Body Spray Voyage 150ml",
-    slug: "park-avenue-signature-collection-body-spray-voyage-150ml",
-    images: [],
-    shortDescription: "Fresh signature fragrance for men",
-    longDescription:
-      "Park Avenue Voyage is a signature collection body spray with a clean and contemporary masculine fragrance profile.",
-    price: "340",
-    category: Category.MEN,
-  },
-  {
-    name: "Park Avenue Signature Collection Body Spray Neo 150ml",
-    slug: "park-avenue-signature-collection-body-spray-neo-150ml",
-    images: [],
-    shortDescription: "Modern fragrance for everyday confidence",
-    longDescription:
-      "Park Avenue Neo features a modern masculine scent designed to complement everyday routines and casual occasions.",
-    price: "340",
     category: Category.MEN,
   },
   {
@@ -202,16 +43,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     category: Category.MEN,
   },
   {
-    name: "NIVEA MEN Body Spray Black & White Invisible 150ml",
-    slug: "nivea-men-body-spray-black-&-white-invisible-150ml",
-    images: [],
-    shortDescription: "Clean everyday deodorant fragrance for men",
-    longDescription:
-      "NIVEA MEN Black & White Invisible is a practical everyday body spray designed for freshness and daily deodorant use.",
-    price: "428",
-    category: Category.MEN,
-  },
-  {
     name: "NIVEA MEN Body Spray Fresh Active 150ml",
     slug: "nivea-men-body-spray-fresh-active-150ml",
     images: [],
@@ -219,16 +50,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     longDescription:
       "NIVEA MEN Fresh Active provides a clean and refreshing fragrance profile suitable for active daily routines.",
     price: "425",
-    category: Category.MEN,
-  },
-  {
-    name: "NIVEA MEN Body Spray Cool Kick Extra Dry 150ml",
-    slug: "nivea-men-body-spray-cool-kick-extra-dry-150ml",
-    images: [],
-    shortDescription: "Cool refreshing fragrance for active days",
-    longDescription:
-      "NIVEA MEN Cool Kick Extra Dry is a refreshing body spray designed for a cool and clean everyday fragrance experience.",
-    price: "475",
     category: Category.MEN,
   },
   {
@@ -262,16 +83,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     category: Category.MEN,
   },
   {
-    name: "Rasasi Relation Men Body Spray 200ml",
-    slug: "rasasi-relation-men-body-spray-200ml",
-    images: [],
-    shortDescription: "Rich masculine body spray for everyday use",
-    longDescription:
-      "Rasasi Relation Men is a generously sized body spray offering a distinctive masculine fragrance for regular wear.",
-    price: "530",
-    category: Category.MEN,
-  },
-  {
     name: "Beverly Hills Polo Club Eight Men's Body Spray 175ml",
     slug: "beverly-hills-polo-club-eight-men's-body-spray-175ml",
     images: [],
@@ -291,17 +102,8 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     price: "625",
     category: Category.MEN,
   },
-  {
-    name: "Kamasutra DEO SPARK 150ml",
-    slug: "kamasutra-deo-spark-150ml",
-    images: [],
-    shortDescription: "Energetic fragrance for men",
-    longDescription:
-      "Kamasutra DEO SPARK is a men's deodorant spray with an energetic fragrance profile suitable for daily wear.",
-    price: "425",
-    category: Category.MEN,
-  },
 
+  // --- WOMEN'S CATEGORY ---
   {
     name: "Fogg Fragrance Body Spray Delicious For Women 120ml",
     slug: "fogg-fragrance-body-spray-delicious-for-women-120ml",
@@ -323,26 +125,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     category: Category.WOMEN,
   },
   {
-    name: "Ossum Perfumed Body Mist For Women Romance 115ml",
-    slug: "ossum-perfumed-body-mist-for-women-romance-115ml",
-    images: [],
-    shortDescription: "Soft romantic fragrance for women",
-    longDescription:
-      "Ossum Romance offers a soft and feminine fragrance profile that works well for everyday wear and relaxed occasions.",
-    price: "535",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Ossum Perfumed Body Mist For Women Delight 115ml",
-    slug: "ossum-perfumed-body-mist-for-women-delight-115ml",
-    images: [],
-    shortDescription: "Fresh feminine fragrance with a light feel",
-    longDescription:
-      "Ossum Delight is a refreshing women's body mist designed for an easy and pleasant everyday fragrance experience.",
-    price: "535",
-    category: Category.WOMEN,
-  },
-  {
     name: "Ossum Fragrance Body Spray Teaser For Women 120ml",
     slug: "ossum-fragrance-body-spray-teaser-for-women-120ml",
     images: [],
@@ -353,42 +135,12 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     category: Category.WOMEN,
   },
   {
-    name: "Ossum Fragrance Body Spray Appeal For Women 120ml",
-    slug: "ossum-fragrance-body-spray-appeal-for-women-120ml",
-    images: [],
-    shortDescription: "Elegant everyday fragrance for women",
-    longDescription:
-      "Ossum Appeal provides a feminine fragrance character designed for regular use and everyday freshness.",
-    price: "495",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Ossum Fragrance Body Spray Desire For Women 120ml",
-    slug: "ossum-fragrance-body-spray-desire-for-women-120ml",
-    images: [],
-    shortDescription: "Distinctive feminine fragrance for outings",
-    longDescription:
-      "Ossum Desire features a feminine fragrance profile designed to complement casual outings and everyday routines.",
-    price: "495",
-    category: Category.WOMEN,
-  },
-  {
     name: "Enchanteur Romantic Body Mist 150ml",
     slug: "enchanteur-romantic-body-mist-150ml",
     images: [],
     shortDescription: "Romantic floral-inspired body mist",
     longDescription:
       "Enchanteur Romantic is a feminine body mist with a romantic fragrance character suitable for everyday wear.",
-    price: "450",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Enchanteur Alluring Body Spray Perfumed Deo Mist 150ml",
-    slug: "enchanteur-alluring-body-spray-perfumed-deo-mist-150ml",
-    images: [],
-    shortDescription: "Alluring feminine fragrance for daily wear",
-    longDescription:
-      "Enchanteur Alluring combines a feminine perfume-like fragrance character with a convenient deodorant mist format.",
     price: "450",
     category: Category.WOMEN,
   },
@@ -423,62 +175,12 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     category: Category.WOMEN,
   },
   {
-    name: "Dove GoFresh Pomegranate and Lemon Deodorant & Body Spray 150ml",
-    slug: "dove-gofresh-pomegranate-and-lemon-deodorant-&-body-spray-150ml",
-    images: [],
-    shortDescription: "Bright fruity fragrance for everyday freshness",
-    longDescription:
-      "Dove GoFresh Pomegranate and Lemon combines a bright fruit-inspired fragrance character with an everyday body spray format.",
-    price: "650",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Dove Original Deodorant & Body Spray 150ml",
-    slug: "dove-original-deodorant-&-body-spray-150ml",
-    images: [],
-    shortDescription: "Classic clean fragrance for daily use",
-    longDescription:
-      "Dove Original provides a familiar clean fragrance character in an easy-to-use deodorant and body spray format.",
-    price: "650",
-    category: Category.WOMEN,
-  },
-  {
     name: "Nivea Body Spray Pearl & Beauty 150ml",
     slug: "nivea-body-spray-pearl-&-beauty-150ml",
     images: [],
     shortDescription: "Soft feminine deodorant fragrance",
     longDescription:
       "NIVEA Pearl & Beauty is a women's body spray with a soft fragrance character designed for everyday underarm freshness.",
-    price: "280",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Nivea Fresh Natural Deodorant Ocean Extracts 150ml",
-    slug: "nivea-fresh-natural-deodorant-ocean-extracts-150ml",
-    images: [],
-    shortDescription: "Fresh ocean-inspired deodorant fragrance",
-    longDescription:
-      "NIVEA Fresh Natural offers a clean ocean-inspired fragrance profile designed for an everyday refreshing feel.",
-    price: "280",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Nivea Protect & Care Deodorant 150ml",
-    slug: "nivea-protect-&-care-deodorant-150ml",
-    images: [],
-    shortDescription: "Clean gentle fragrance for everyday use",
-    longDescription:
-      "NIVEA Protect & Care provides a gentle everyday fragrance profile in a convenient deodorant spray format.",
-    price: "280",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Nivea Whitening Sensitive Mulethi Extracts Deodorant 150ml",
-    slug: "nivea-whitening-sensitive-mulethi-extracts-deodorant-150ml",
-    images: [],
-    shortDescription: "Gentle deodorant fragrance for sensitive routines",
-    longDescription:
-      "NIVEA Whitening Sensitive is a women's deodorant spray designed around a gentle everyday fragrance experience.",
     price: "280",
     category: Category.WOMEN,
   },
@@ -499,16 +201,6 @@ export const mockProducts: Prisma.ProductCreateManyInput[] = [
     shortDescription: "Fruity feminine fragrance with a vibrant feel",
     longDescription:
       "Fa Pink Passion offers a lively feminine fragrance profile in a large-format deodorant spray suitable for everyday use.",
-    price: "750",
-    category: Category.WOMEN,
-  },
-  {
-    name: "Fa Deodorant Spray Mystic Moment 200ml",
-    slug: "fa-deodorant-spray-mystic-moment-200ml",
-    images: [],
-    shortDescription: "Mysterious feminine fragrance for everyday use",
-    longDescription:
-      "Fa Mystic Moment provides a distinctive feminine fragrance character designed to add freshness throughout the day.",
     price: "750",
     category: Category.WOMEN,
   },

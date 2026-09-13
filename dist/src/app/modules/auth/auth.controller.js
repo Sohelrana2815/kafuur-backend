@@ -114,7 +114,7 @@ const googleCallbackController = catchAsync(async (req, res) => {
     }
     // 2. Ensure passport successfully attached the user
     const user = req.user;
-    console.log(user, "From Controller");
+    // console.log(user, "From Controller")
     if (!user) {
         throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
     }
