@@ -3,7 +3,7 @@ export const setAuthCookie = (res, tokenInfo) => {
         res.cookie("accessToken", tokenInfo.accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "lax",
             maxAge: 60 * 60 * 60 * 1000, // 1 day
         });
     }
@@ -11,7 +11,7 @@ export const setAuthCookie = (res, tokenInfo) => {
         res.cookie("refreshToken", tokenInfo.refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "lax",
             maxAge: 30 * 60 * 60 * 60 * 1000, // 30 days
         });
     }

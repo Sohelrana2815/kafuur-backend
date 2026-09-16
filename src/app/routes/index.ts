@@ -6,6 +6,7 @@ import { UserRoutes } from "../modules/user/user.route.js";
 import { AuthRoutes } from "../modules/auth/auth.route.js";
 import { CartRoutes } from "../modules/cart/cart.route.js";
 import { OrderRoutes } from "../modules/order/order.route.js";
+import { DashboardRoutes } from "../modules/dashboard/dashboard.route.js";
 
 export const router = Router();
 
@@ -17,6 +18,7 @@ const moduleRoutes = [
   { path: "/cart", route: CartRoutes },
   { path: "/orders", route: OrderRoutes },
   { path: "/articles", route: ArticleRoutes },
+  { path: "/dashboard", route: DashboardRoutes },
 ];
 
 moduleRoutes.forEach((route) => {
