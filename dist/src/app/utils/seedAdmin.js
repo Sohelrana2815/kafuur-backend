@@ -10,7 +10,6 @@ export const seedAdmin = async () => {
             where: { role: "ADMIN" },
         });
         if (adminExists) {
-            console.log("Admin record already exists. Skipping seed.");
             return;
         }
         // 2. Hashed password
@@ -32,7 +31,6 @@ export const seedAdmin = async () => {
                 },
             },
         });
-        console.log("✅ Admin user created successfully!");
     }
     catch (error) {
         console.error("❌ Error seeding admin:", error);

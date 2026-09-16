@@ -108,8 +108,8 @@ const createOrder = async (userId, payload) => {
             payment_method_types: ["card"],
             mode: "payment",
             // success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-            success_url: `${process.env.FRONTEND_URL}/payment-success?orderId=${order.id}`,
-            cancel_url: `${process.env.FRONTEND_URL}/checkout/cancel`,
+            success_url: `${envVars.FRONTEND_URL}/payment-success?orderId=${order.id}`,
+            cancel_url: `${envVars.FRONTEND_URL}/checkout/cancel`,
             customer_email: user.email,
             client_reference_id: order.id,
             expires_at: Math.floor(Date.now() / 1000) + 1 * 60 * 60, // 2 hours in Unix Epoch
@@ -172,7 +172,17 @@ const getMyOrders = async (userId) => {
         prisma.order.findMany({
             where: { userId },
             include: {
-                orderItems: true,
+                orderItems: {
+                    include: {
+                        product: {
+                            select: {
+                                name: true,
+                                category: true,
+                                images: true,
+                            },
+                        },
+                    },
+                },
             },
             orderBy: {
                 createdAt: "desc",
@@ -287,16 +297,10 @@ const updateMyOrder = async (orderId, userId, payload) => {
         throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, `Order cannot be updated once it is ${existingOrder.status.toLowerCase()}`);
     }
     // Secondary Guard: Explicitly restrict modifications to safe fields
-    const allowedCustomerFields = [
-        "status",
-        // "altPhone",
-        // "address",
-        // "city",
-        // "thana",
-    ];
+    const allowedCustomerFields = ["status"]; // add more if needed
     const payloadKeys = Object.keys(payload);
-    const containsRestrictedFields = payloadKeys.some((key) => !allowedCustomerFields.includes(key));
-    if (containsRestrictedFields) {
+    const allFieldsAllowed = payloadKeys.every((key) => allowedCustomerFields.includes(key));
+    if (!allFieldsAllowed) {
         throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "You are trying to update restricted fields.");
     }
     const updatedOrder = await prisma.order.update({

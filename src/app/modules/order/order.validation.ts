@@ -29,6 +29,10 @@ const updateOrderCustomerBodySchema = z.object({
   city: z.string().optional(),
   thana: z.string().optional(),
 });
+const updateOrderStatusCommonBodySchema = z.object({
+  // Customers can only transition status to CANCELLED
+  status: z.enum([OrderStatus.CANCELLED]).optional(),
+});
 
 const createOrderZodSchema = z.object({
   body: createOrderBodySchema,
@@ -39,9 +43,13 @@ const updateOrderAdminZodSchema = z.object({
 const updateOrderCustomerZodSchema = z.object({
   body: updateOrderCustomerBodySchema,
 });
+const updateOrderStatusCommonZodSchema = z.object({
+  body: updateOrderStatusCommonBodySchema,
+});
 
 export const OrderValidation = {
   createOrderZodSchema,
   updateOrderAdminZodSchema,
   updateOrderCustomerZodSchema,
+  updateOrderStatusCommonZodSchema,
 };

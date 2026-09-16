@@ -12,7 +12,6 @@ export const seedAdmin = async () => {
     });
 
     if (adminExists) {
-      console.log("Admin record already exists. Skipping seed.");
       return;
     }
 
@@ -42,7 +41,6 @@ export const seedAdmin = async () => {
       },
     });
 
-    console.log("✅ Admin user created successfully!");
   } catch (error) {
     console.error("❌ Error seeding admin:", error);
   }

@@ -8,22 +8,12 @@ import { createUserTokens } from "../../utils/userTokens.js";
 import { envVars } from "../../config/env.js";
 import passport from "passport";
 const credentialsLogin = catchAsync(async (req, res, next) => {
-    // const loginInfo = await AuthServices.credentialsLogin(req.body) // ❌❌❌ Not needed the service create user codes
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.authenticate("local", async (err, user, info) => {
         if (err) {
-            // ❌❌❌❌❌
-            // throw new AppError(401, "Some error")
-            // next(err)
-            // return new AppError(401, err)
-            // ✅✅✅✅
-            // return next(err)
-            // console.log("from err");
             return next(new AppError(401, err));
         }
         if (!user) {
-            // console.log("from !user");
-            // return new AppError(401, info.message)
             return next(new AppError(401, info.message));
         }
         const userTokens = createUserTokens(user);
@@ -42,39 +32,7 @@ const credentialsLogin = catchAsync(async (req, res, next) => {
             },
         });
     })(req, res, next);
-    // res.cookie("accessToken", loginInfo.accessToken, {
-    //     httpOnly: true,
-    //     secure: false
-    // })
-    // res.cookie("refreshToken", loginInfo.refreshToken, {
-    //     httpOnly: true,
-    //     secure: false,
-    // })
 });
-// const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
-//   const result = await AuthServices.credentialsLogin(req.body);
-//   // const { accessToken, refreshToken, user } = result;
-//   // Set Access Token in HTTP-Only Cookie exactly like your core configurations
-//   // res.cookie("accessToken", accessToken, {
-//   //   httpOnly: true,
-//   //   secure: process.env.NODE_ENV === "production",
-//   //   sameSite: "strict",
-//   //   maxAge: 60 * 60 * 60 * 1000, // 1 day
-//   // });
-//   // res.cookie("refreshToken", refreshToken, {
-//   //   httpOnly: true,
-//   //   secure: process.env.NODE_ENV === "production",
-//   //   sameSite: "strict",
-//   //   maxAge: 30 * 60 * 60 * 60 * 1000, // 30 days
-//   // });
-//   setAuthCookie(res, result);
-//   sendResponse(res, {
-//     statusCode: httpStatus.StatusCodes.OK,
-//     success: true,
-//     message: "User Logged in Successfully",
-//     data: result,
-//   });
-// });
 const getNewAccessToken = catchAsync(async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
@@ -114,7 +72,7 @@ const googleCallbackController = catchAsync(async (req, res) => {
     }
     // 2. Ensure passport successfully attached the user
     const user = req.user;
-    // console.log(user, "From Controller")
+    console.log(user, "From Controller");
     if (!user) {
         throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "User not found");
     }

@@ -10,7 +10,7 @@ function getEnv(key, defaultValue) {
 export const envVars = {
     PORT: getEnv("PORT", "5000"),
     DATABASE_URL: getEnv("DATABASE_URL"),
-    NODE_ENV: getEnv("NODE_ENV", "development"),
+    NODE_ENV: getEnv("NODE_ENV"),
     BCRYPT_SALT_ROUND: getEnv("BCRYPT_SALT_ROUND"),
     //  Access Token
     JWT_ACCESS_SECRET: getEnv("JWT_ACCESS_SECRET"),

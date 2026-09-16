@@ -66,13 +66,6 @@ const getMyProfile = async (userId) => {
     return userWithoutPassword;
 };
 const updateMyProfile = async (userId, payload) => {
-    /**
-     * Email cannot update
-     * name, phone, address, city, thana can be updated
-     * password cannot be updated, I have separate API for update password
-     * only admin can update role, isDeleted, statuses
-     * User role update customer --> admin (Only admin can update role)
-     */
     const existingUser = await prisma.user.findUnique({
         where: { id: userId },
     });
@@ -92,14 +85,6 @@ const updateMyProfile = async (userId, payload) => {
     if (hasRestrictedFields) {
         throw new AppError(httpStatus.StatusCodes.BAD_REQUEST, "You cannot update restricted fields");
     }
-    // // Hash password if they are updating it
-    // if (payload.password) {
-    //   const saltRounds = Number(envVars.BCRYPT_SALT_ROUND) || 10;
-    //   payload.password = await bcrypt.hash(
-    //     payload.password as string,
-    //     saltRounds,
-    //   );
-    // }
     const updatedUser = await prisma.user.update({
         where: { id: userId },
         data: payload,

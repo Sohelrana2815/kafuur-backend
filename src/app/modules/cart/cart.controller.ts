@@ -19,8 +19,8 @@ const getCarts = catchAsync(async (req: Request, res: Response) => {
   }
   // --- THE FIX STARTS HERE ---
   // Parse comma-separated IDs if provided in the URL: ?ids=id1,id2
-  const cartItemIds = req.query.ids
-    ? (req.query.ids as string).split(",")
+  const cartItemIds = req.query.ids 
+    ? (req.query.ids as string).split(",") 
     : undefined;
 
   // Pass the extracted array as the second argument

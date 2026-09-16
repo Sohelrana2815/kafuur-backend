@@ -37,7 +37,6 @@ passport.use(new LocalStrategy({
         return done(null, isUserExist);
     }
     catch (error) {
-        console.log(error);
         done(error);
     }
 }));
@@ -120,7 +119,6 @@ passport.deserializeUser(async (id, done) => {
         done(null, user);
     }
     catch (error) {
-        console.error("Failed to load user session:", error);
         done(error);
     }
 });

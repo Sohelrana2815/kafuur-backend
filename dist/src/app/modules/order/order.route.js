@@ -16,7 +16,7 @@ router.get("/", auth(Role.ADMIN), OrderControllers.getAllOrders);
 router.get("/my-orders", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getMyOrders);
 router.get("/:id", auth(Role.CUSTOMER, Role.ADMIN), OrderControllers.getOrderById);
 // Customer update route (Cancel or update delivery address before processing)
-router.patch("/my-orders/:id", auth(Role.CUSTOMER, Role.ADMIN), validateRequest(OrderValidation.updateOrderCustomerZodSchema), OrderControllers.updateMyOrder);
+router.patch("/cancel/:id", auth(Role.CUSTOMER, Role.ADMIN), validateRequest(OrderValidation.updateOrderStatusCommonZodSchema), OrderControllers.updateMyOrder);
 // Admin update route (Status updates, payment status adjustments, logistics)
 router.patch("/:id", auth(Role.ADMIN), validateRequest(OrderValidation.updateOrderAdminZodSchema), OrderControllers.updateOrderAdmin);
 export const OrderRoutes = router;

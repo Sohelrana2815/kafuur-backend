@@ -34,9 +34,9 @@ router.get(
 );
 // Customer update route (Cancel or update delivery address before processing)
 router.patch(
-  "/my-orders/:id",
+  "/cancel/:id",
   auth(Role.CUSTOMER, Role.ADMIN),
-  validateRequest(OrderValidation.updateOrderCustomerZodSchema),
+  validateRequest(OrderValidation.updateOrderStatusCommonZodSchema),
   OrderControllers.updateMyOrder,
 );
 

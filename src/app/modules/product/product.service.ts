@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Product } from "@prisma/client";
-import prisma from "../../lib/prisma.js"; // Leverages your exact centralized Prisma file link [cite: 1]
-import AppError from "../../errorsHelpers/AppError.js"; // Leverages your standard AppError handler [cite: 2]
+import prisma from "../../lib/prisma.js"; 
+import AppError from "../../errorsHelpers/AppError.js"; 
 import httpStatus from "http-status-codes";
 import { deleteImageFromCloudinary } from "../../config/cloudinary.config.js";
 import { TUpdateProductInput } from "./product.validation.js";
@@ -10,7 +9,6 @@ import { QueryBuilder } from "../../utils/QueryBuilder.js";
 import { generateUniqueSlug } from "../../helper/generateUniqueSlug.js";
 
 const createProduct = async (payload: Product): Promise<Product> => {
-  // Automatically generate an entirely unique slug (e.g., "nike-air-max" or "nike-air-max-0")
   const uniqueSlug = await generateUniqueSlug(payload.name);
 
   // Write new entity data directly into the database engine
@@ -18,11 +16,11 @@ const createProduct = async (payload: Product): Promise<Product> => {
     data: {
       name: payload.name,
       slug: uniqueSlug,
-      images: payload.images, // Array mapping for multiple asset path entries
+      images: payload.images, 
       shortDescription: payload.shortDescription,
       longDescription: payload.longDescription,
-      price: payload.price, // Prisma automatically maps this float/string safely down to db.Decimal(10,2)
-      category: payload.category, // Strictly validated matching MEN | WOMEN enums
+      price: payload.price, 
+      category: payload.category, 
     },
   });
 

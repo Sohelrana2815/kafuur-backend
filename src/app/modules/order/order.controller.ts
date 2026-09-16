@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
@@ -9,8 +8,8 @@ import { OrderServices } from "./order.service.js";
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   // Utilizing your clean global Express interface
-  const userId = (req.user as JwtPayload)?.userId;
-  console.log(userId, req.body, "From controller");
+ const userId =  (req.user as JwtPayload)?.userId;
+  console.log(userId,req.body,"From controller");
   if (!userId) {
     throw new AppError(
       httpStatus.StatusCodes.UNAUTHORIZED,
