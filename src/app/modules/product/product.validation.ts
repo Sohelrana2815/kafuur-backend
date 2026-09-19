@@ -85,6 +85,14 @@ const updateProductBodySchema = z.object({
   newImages: z.array(z.url()).optional(),
 });
 
+const getRecommendationsBodySchema = z.object({
+  usages: z.array(z.string({ error: "Usages are required" })),
+  scents: z.array(z.string({ error: "Scents are required" })),
+  strength: z.string({ error: "Strength is required" }),
+  minPrice: z.number().min(0),
+  maxPrice: z.number().min(0),
+});
+
 export type TUpdateProductInput = z.infer<typeof updateProductBodySchema>;
 
 // Add this below your updateProductZodSchema
@@ -105,9 +113,13 @@ const updateProductZodSchema = z.object({
 const deleteProductsZodSchema = z.object({
   body: deleteProductsBodySchema,
 });
+const getRecommendationsZodSchema = z.object({
+  body: getRecommendationsBodySchema,
+});
 
 export const ProductValidation = {
   createProductZodSchema,
   updateProductZodSchema,
   deleteProductsZodSchema,
+  getRecommendationsZodSchema,
 };

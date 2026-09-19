@@ -168,6 +168,47 @@ const softDeleteProductById = async (id) => {
     });
     return result;
 };
+export const getRecommendations = async (answers) => {
+    // 1. Strict Filter: Fetch products within the user's budget that are not deleted
+    const candidates = await prisma.product.findMany({
+        where: {
+            isDeleted: false,
+            price: {
+                gte: answers.minPrice,
+                lte: answers.maxPrice > 0 ? answers.maxPrice : undefined, // Handle 1000+ budget
+            },
+        },
+    });
+    // 2. Scoring Algorithm
+    const scoredProducts = candidates.map((product) => {
+        let score = 0;
+        const maxScore = 3; // 1 for scent, 1 for usage, 1 for strength
+        // Check Usage Match (If the product has at least one matching usage)
+        const hasUsageMatch = product.usages.some((u) => answers.usages.includes(u));
+        if (hasUsageMatch)
+            score += 1;
+        // Check Scent Match
+        const hasScentMatch = product.scentProfiles.some((s) => answers.scents.includes(s));
+        if (hasScentMatch)
+            score += 1;
+        // Check Strength Match
+        if (product.strength === answers.strength) {
+            score += 1;
+        }
+        // Calculate Percentage Match (e.g., 2/3 = 66%, 3/3 = 100%)
+        // You can tweak this math to prioritize certain traits (e.g., scent is worth 2 points)
+        const matchPercentage = Math.round((score / maxScore) * 100);
+        return {
+            product,
+            matchPercentage,
+        };
+    });
+    // 3. Sort and Return Top 3
+    return scoredProducts
+        .filter((item) => item.matchPercentage > 0) // Remove 0% matches
+        .sort((a, b) => b.matchPercentage - a.matchPercentage)
+        .slice(0, 3);
+};
 export const ProductServices = {
     createProduct,
     getAllProducts,
@@ -177,4 +218,5 @@ export const ProductServices = {
     softDeleteProductById,
     getProductById,
     getSingleProduct,
+    getRecommendations,
 };

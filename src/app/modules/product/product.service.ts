@@ -1,12 +1,13 @@
 import { Product } from "@prisma/client";
-import prisma from "../../lib/prisma.js"; 
-import AppError from "../../errorsHelpers/AppError.js"; 
+import prisma from "../../lib/prisma.js";
+import AppError from "../../errorsHelpers/AppError.js";
 import httpStatus from "http-status-codes";
 import { deleteImageFromCloudinary } from "../../config/cloudinary.config.js";
 import { TUpdateProductInput } from "./product.validation.js";
 import { productSearchableFields } from "./product.constant.js";
 import { QueryBuilder } from "../../utils/QueryBuilder.js";
 import { generateUniqueSlug } from "../../helper/generateUniqueSlug.js";
+import { QuizAnswers } from "./product.interface.js";
 
 const createProduct = async (payload: Product): Promise<Product> => {
   const uniqueSlug = await generateUniqueSlug(payload.name);
@@ -16,11 +17,11 @@ const createProduct = async (payload: Product): Promise<Product> => {
     data: {
       name: payload.name,
       slug: uniqueSlug,
-      images: payload.images, 
+      images: payload.images,
       shortDescription: payload.shortDescription,
       longDescription: payload.longDescription,
-      price: payload.price, 
-      category: payload.category, 
+      price: payload.price,
+      category: payload.category,
     },
   });
 
@@ -180,22 +181,22 @@ const deleteProductById = async (id: string) => {
   const productToDelete = await prisma.product.findUnique({
     where: { id },
   });
-  if(!productToDelete){
+  if (!productToDelete) {
     throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Product not found");
   }
-  
 
   // Delete images from Cloudinary
   if (productToDelete.images && productToDelete.images.length > 0) {
-    await Promise.all(productToDelete.images.map((url) => deleteImageFromCloudinary(url)));
+    await Promise.all(
+      productToDelete.images.map((url) => deleteImageFromCloudinary(url)),
+    );
   }
 
   // hard delete the product from the database
- const result =  await prisma.product.delete({
+  const result = await prisma.product.delete({
     where: { id },
   });
   return result;
-
 };
 const softDeleteProductById = async (id: string) => {
   const productToDelete = await prisma.product.findUnique({
@@ -203,16 +204,13 @@ const softDeleteProductById = async (id: string) => {
   });
 
   if (!productToDelete) {
-    throw new AppError(
-      httpStatus.StatusCodes.NOT_FOUND,
-      "Product not found"
-    );
+    throw new AppError(httpStatus.StatusCodes.NOT_FOUND, "Product not found");
   }
 
   if (productToDelete.isDeleted) {
     throw new AppError(
       httpStatus.StatusCodes.BAD_REQUEST,
-      "Product is already deleted"
+      "Product is already deleted",
     );
   }
 
@@ -226,6 +224,57 @@ const softDeleteProductById = async (id: string) => {
   return result;
 };
 
+export const getRecommendations = async (answers: QuizAnswers) => {
+  // 1. Strict Filter: Fetch products within the user's budget that are not deleted
+  const candidates = await prisma.product.findMany({
+    where: {
+      isDeleted: false,
+      price: {
+        gte: answers.minPrice,
+        lte: answers.maxPrice > 0 ? answers.maxPrice : undefined, // Handle 1000+ budget
+      },
+    },
+  });
+
+  // 2. Scoring Algorithm
+  const scoredProducts = candidates.map((product) => {
+    let score = 0;
+    const maxScore = 3; // 1 for scent, 1 for usage, 1 for strength
+
+    // Check Usage Match (If the product has at least one matching usage)
+    const hasUsageMatch = product.usages.some((u) =>
+      answers.usages.includes(u),
+    );
+    if (hasUsageMatch) score += 1;
+
+    // Check Scent Match
+    const hasScentMatch = product.scentProfiles.some((s) =>
+      answers.scents.includes(s),
+    );
+    if (hasScentMatch) score += 1;
+
+    // Check Strength Match
+    if (product.strength === answers.strength) {
+      score += 1;
+    }
+
+    // Calculate Percentage Match (e.g., 2/3 = 66%, 3/3 = 100%)
+    // You can tweak this math to prioritize certain traits (e.g., scent is worth 2 points)
+    const matchPercentage = Math.round((score / maxScore) * 100);
+
+    return {
+      product,
+      matchPercentage,
+    };
+  });
+
+  // 3. Sort and Return Top 3
+  return scoredProducts
+    .filter((item) => item.matchPercentage > 0) // Remove 0% matches
+    .sort((a, b) => b.matchPercentage - a.matchPercentage)
+    .slice(0, 3);
+};
+
 export const ProductServices = {
   createProduct,
   getAllProducts,
@@ -235,4 +284,5 @@ export const ProductServices = {
   softDeleteProductById,
   getProductById,
   getSingleProduct,
+  getRecommendations,
 };

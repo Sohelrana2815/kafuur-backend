@@ -44,6 +44,27 @@ enum UserStatus {
   DELETED
 }
 
+enum ScentProfile {
+  FRESH
+  SWEET
+  WOODY
+  SPICY
+}
+
+enum UsageOccasion {
+  DAILY
+  OFFICE
+  PARTY
+  DATE
+  OUTDOOR
+}
+
+enum ScentStrength {
+  MILD
+  MEDIUM
+  STRONG
+}
+
 model AuthProvider {
   provider   String
   providerId String
@@ -75,17 +96,20 @@ model User {
 }
 
 model Product {
-  id               String      @id @default(ulid())
+  id               String          @id @default(ulid())
   name             String
-  slug             String      @unique
+  slug             String          @unique
   images           String[]
   shortDescription String
   longDescription  String
-  price            Decimal     @db.Decimal(10, 2)
+  price            Decimal         @db.Decimal(10, 2)
   category         Category
-  isDeleted        Boolean     @default(false)
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  scentProfiles    ScentProfile[]
+  usages           UsageOccasion[]
+  strength         ScentStrength?
+  isDeleted        Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
   orderItems       OrderItem[]
   reviews          Review[]
   cartItems        CartItem[]
@@ -116,34 +140,34 @@ model Review {
 }
 
 model Order {
-  id              String        @id @default(ulid())
-  customerName    String
-  phone           String
-  altPhone        String?
-  email           String?
-  address         String        @db.Text
-  city            String
-  thana           String
-  
+  id           String  @id @default(ulid())
+  customerName String
+  phone        String
+  altPhone     String?
+  email        String?
+  address      String  @db.Text
+  city         String
+  thana        String
+
   // -- STATUS FIELDS --
-  status          OrderStatus   @default(PENDING)
-  paymentMethod   PaymentMethod @default(COD) 
-  paymentStatus   PaymentStatus @default(UNPAID) 
-  
+  status        OrderStatus   @default(PENDING)
+  paymentMethod PaymentMethod @default(COD)
+  paymentStatus PaymentStatus @default(UNPAID)
+
   // -- STRIPE & TIMEOUT FIELDS (NEW) --
-  transactionId   String?       @unique // Stores the final Stripe Receipt/Charge ID on success
-  stripeSessionId String?       @unique // Stores the temporary Session ID to track the user's checkout
-  expiresAt       DateTime?     // Tracks the 2-hour timeout for ONLINE payments
+  transactionId   String?   @unique // Stores the final Stripe Receipt/Charge ID on success
+  stripeSessionId String?   @unique // Stores the temporary Session ID to track the user's checkout
+  expiresAt       DateTime? // Tracks the 2-hour timeout for ONLINE payments
 
   // -- PRICING & RELATIONS --
-  deliveryFee     Decimal       @default(60.00) @db.Decimal(10, 2)
-  totalAmount     Decimal       @db.Decimal(10, 2)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  orderItems      OrderItem[]
-  
-  userId          String?
-  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  deliveryFee Decimal     @default(60.00) @db.Decimal(10, 2)
+  totalAmount Decimal     @db.Decimal(10, 2)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model OrderItem {
@@ -169,5 +193,4 @@ model CartItem {
 
   // This compound unique index is the secret sauce for clean design standards
   @@unique([userId, productId])
-  
 }

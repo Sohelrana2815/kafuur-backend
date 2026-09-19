@@ -39,6 +39,12 @@ router.post(
   ProductControllers.createProduct,
 );
 
+router.post(
+  "/recommendations",
+  validateRequest(ProductValidation.getRecommendationsZodSchema),
+  ProductControllers.getRecommendations,
+);
+
 router.get("/", ProductControllers.getAllProducts);
 // DELETE PRODUCTS
 router.patch(

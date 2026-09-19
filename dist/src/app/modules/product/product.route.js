@@ -27,6 +27,7 @@ router.post("/", auth(Role.ADMIN), multerUpload.array("files"),
     }
     next();
 }, validateRequest(ProductValidation.createProductZodSchema), ProductControllers.createProduct);
+router.post("/recommendations", validateRequest(ProductValidation.getRecommendationsZodSchema), ProductControllers.getRecommendations);
 router.get("/", ProductControllers.getAllProducts);
 // DELETE PRODUCTS
 router.patch("/bulk-delete", auth(Role.ADMIN), validateRequest(ProductValidation.deleteProductsZodSchema), ProductControllers.deleteProducts);

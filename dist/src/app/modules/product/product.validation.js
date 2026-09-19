@@ -66,6 +66,13 @@ const updateProductBodySchema = z.object({
     // Cloudinary URL strings are valid URLs, so z.url() is the correct strict check here
     newImages: z.array(z.url()).optional(),
 });
+const getRecommendationsBodySchema = z.object({
+    usages: z.array(z.string({ error: "Usages are required" })),
+    scents: z.array(z.string({ error: "Scents are required" })),
+    strength: z.string({ error: "Strength is required" }),
+    minPrice: z.number().min(0),
+    maxPrice: z.number().min(0),
+});
 // Add this below your updateProductZodSchema
 const deleteProductsBodySchema = z.object({
     ids: z
@@ -81,8 +88,12 @@ const updateProductZodSchema = z.object({
 const deleteProductsZodSchema = z.object({
     body: deleteProductsBodySchema,
 });
+const getRecommendationsZodSchema = z.object({
+    body: getRecommendationsBodySchema,
+});
 export const ProductValidation = {
     createProductZodSchema,
     updateProductZodSchema,
     deleteProductsZodSchema,
+    getRecommendationsZodSchema,
 };

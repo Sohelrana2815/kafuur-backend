@@ -122,7 +122,7 @@ const softDeleteProductById = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
 
-   const result =  await ProductServices.softDeleteProductById(id);
+    const result = await ProductServices.softDeleteProductById(id);
 
     sendResponse(res, {
       statusCode: httpStatus.StatusCodes.OK,
@@ -130,8 +130,28 @@ const softDeleteProductById = catchAsync(
       message: "Product successfully deleted.",
       data: result,
     });
-  }
+  },
 );
+
+const getRecommendations = async (req: Request, res: Response) => {
+  try {
+    // req.body is already validated by Zod at this point
+    const recommendations = await ProductServices.getRecommendations(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Fragrance recommendations retrieved successfully",
+      data: recommendations,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch recommendations",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 export const ProductControllers = {
   createProduct,
   getAllProducts,
@@ -141,4 +161,5 @@ export const ProductControllers = {
   softDeleteProductById,
   getProductById,
   getSingleProduct,
+  getRecommendations,
 };
