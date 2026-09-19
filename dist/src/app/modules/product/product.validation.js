@@ -1,3 +1,4 @@
+import { Category, ScentProfile, ScentStrength, UsageOccasion, } from "@prisma/client";
 import { z } from "zod";
 const createProductBodySchema = z.object({
     name: z
@@ -29,6 +30,16 @@ const createProductBodySchema = z.object({
         .positive("Price must be a positive currency amount greater than 0"),
     category: z.enum(["MEN", "WOMEN"], {
         error: "Category must be either MEN or WOMEN",
+    }),
+    // Required fragrance metadata
+    usages: z
+        .array(z.enum(UsageOccasion))
+        .min(1, "At least one usage occasion is required"),
+    scentProfiles: z
+        .array(z.enum(ScentProfile))
+        .min(1, "At least one scent profile is required"),
+    strength: z.enum(ScentStrength, {
+        error: "Scent strength is required",
     }),
 });
 // Future Proofing: Update schema where all properties are optional
@@ -65,13 +76,36 @@ const updateProductBodySchema = z.object({
     deleteImages: z.array(z.url({ message: "Must be a valid URL" })).optional(),
     // Cloudinary URL strings are valid URLs, so z.url() is the correct strict check here
     newImages: z.array(z.url()).optional(),
+    // Optional on update to support partial updates
+    scentProfiles: z.array(z.enum(ScentProfile)).optional(),
+    usages: z.array(z.enum(UsageOccasion)).optional(),
+    strength: z.enum(ScentStrength).optional(),
 });
-const getRecommendationsBodySchema = z.object({
-    usages: z.array(z.string({ error: "Usages are required" })),
-    scents: z.array(z.string({ error: "Scents are required" })),
-    strength: z.string({ error: "Strength is required" }),
-    minPrice: z.number().min(0),
-    maxPrice: z.number().min(0),
+const getRecommendationsBodySchema = z
+    .object({
+    usages: z
+        .array(z.enum(UsageOccasion, {
+        error: "Provide scent usages. e.g, Office, Outdoor etc.",
+    }))
+        .min(1, "Select at least one usage occasion"),
+    scentProfiles: z
+        .array(z.enum(ScentProfile, {
+        error: "Provide scent profiles e.g, Fresh, Sweet or else.",
+    }))
+        .min(1, "Select at least one scent profile"),
+    strength: z.enum(ScentStrength, {
+        error: "Scent strength is required",
+    }),
+    category: z.enum(Category).optional(),
+    minPrice: z.number().min(0).optional(),
+    maxPrice: z.number().min(0).optional(),
+})
+    .refine((data) => data.minPrice === undefined ||
+    data.maxPrice === undefined ||
+    data.maxPrice === 0 ||
+    data.maxPrice >= data.minPrice, {
+    message: "Maximum price must be greater than or equal to minimum price",
+    path: ["maxPrice"],
 });
 // Add this below your updateProductZodSchema
 const deleteProductsBodySchema = z.object({
