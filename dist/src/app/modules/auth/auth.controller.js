@@ -78,11 +78,24 @@ const googleCallbackController = catchAsync(async (req, res) => {
     }
     // 3. Create your JWT tokens
     const tokenInfo = createUserTokens(user);
+    // 4. Construct the redirect URL to the Next.js frontend handler
+    // Use the URL object to cleanly handle query parameters
+    const frontendCallbackUrl = new URL(`${envVars.FRONTEND_URL}/api/auth/callback`);
+    if (tokenInfo.accessToken) {
+        frontendCallbackUrl.searchParams.append("accessToken", tokenInfo.accessToken);
+    }
+    if (tokenInfo.refreshToken) {
+        frontendCallbackUrl.searchParams.append("refreshToken", tokenInfo.refreshToken);
+    }
+    if (redirectTo) {
+        frontendCallbackUrl.searchParams.append("redirect", redirectTo);
+    }
     // 4. Attach the tokens to the response cookies
-    setAuthCookie(res, tokenInfo);
+    // setAuthCookie(res, tokenInfo);
     // 5. REDIRECT back to the frontend instead of sending a JSON response. 
     // This is required for OAuth flows to close the loop.
-    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
+    // res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`);
+    res.redirect(frontendCallbackUrl.toString());
 });
 const logout = catchAsync(async (req, res) => {
     res.clearCookie("accessToken", {
