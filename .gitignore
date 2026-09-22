@@ -8,4 +8,4 @@ node_modules
 .env
 .env.local
 .env.*.local
-echo ".env.local" >> .gitignore
+echo ".env.local" >> .gitignoredist/
