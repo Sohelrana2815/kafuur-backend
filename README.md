@@ -2,6 +2,12 @@
 
 REST API and backend services for **Kafuur**, a premium fragrance and body spray e-commerce platform.
 
+## Admin credentials 
+
+### email: admin@test.com
+### password: admin
+
+
 ## Overview
 
 Kafuur Backend provides the server-side API, business logic, authentication, database operations, order processing, and payment integration for the Kafuur e-commerce platform.
